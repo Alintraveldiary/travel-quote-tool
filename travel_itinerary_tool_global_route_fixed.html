@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>旅行定制师 · 行程工作台</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-size:14px}
+body{background:#f0f4f8;color:#1e293b;font-family:'Noto Sans SC',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:#f0f4f8}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .18s ease forwards}
+
+/* Day card */
+.day-card{border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-bottom:8px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:box-shadow .15s,border-color .15s}
+.day-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.09);border-color:#c7d2e0}
+
+/* Rush badges */
+.rush-ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;font-size:10px;padding:2px 8px;border-radius:20px;font-family:'IBM Plex Mono',monospace;white-space:nowrap;display:inline-block}
+.rush-warn{background:#fffbeb;border:1px solid #fde68a;color:#b45309;font-size:10px;padding:2px 8px;border-radius:20px;font-family:'IBM Plex Mono',monospace;white-space:nowrap;display:inline-block}
+.rush-danger{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:10px;padding:2px 8px;border-radius:20px;font-family:'IBM Plex Mono',monospace;white-space:nowrap;display:inline-block}
+
+input,textarea,button{font-family:'Noto Sans SC',sans-serif}
+button{cursor:pointer}
+textarea{resize:vertical}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+'use strict';
+var R = React;
+var h = React.createElement;
+var useState = R.useState;
+
+// ─────────────────────────────────────────────
+// COLOR TOKENS  (light theme)
+// ─────────────────────────────────────────────
+var C = {
+  // backgrounds
+  bg:        '#f0f4f8',   // page bg
+  surface:   '#ffffff',   // card / panel bg
+  surfaceAlt:'#f8fafc',   // slightly off-white section
+  sidebar:   '#ffffff',   // left sidebar
+  header:    '#ffffff',   // top header
+  // borders
+  border:    '#e2e8f0',
+  borderMid: '#cbd5e1',
+  // text
+  text:      '#1e293b',   // primary text
+  textMid:   '#475569',   // secondary
+  textSub:   '#94a3b8',   // placeholder / label
+  textFaint: '#cbd5e1',   // very faint
+  // accent (sky blue)
+  accent:    '#0ea5e9',
+  accentBg:  '#f0f9ff',
+  accentBorder:'#bae6fd',
+  accentText:'#0369a1',
+  // input
+  inputBg:   '#f8fafc',
+  inputBorder:'#e2e8f0',
+  inputFocus:'#0ea5e9',
+  // tag active
+  tagActiveBg:'#eff6ff',
+  tagActiveBorder:'#93c5fd',
+  tagActiveText:'#1d4ed8',
+};
+
+// ─────────────────────────────────────────────
+// DESTINATION DATABASE
+// ─────────────────────────────────────────────
+var DEST_DB = {
+  '日本':{
+    cities:['东京','大阪','京都','奈良','镰仓','箱根','广岛','宫岛','名古屋','北海道','福冈'],
+    highlights:['樱花赏花','温泉体验','寿司文化','枯山水庭园','和服体验','茶道体验','富士山日出','秋叶原科技'],
+    mustSee:{
+      '东京':['浅草寺','新宿御苑','秋叶原','涩谷十字路口','上野公园','筑地市场'],
+      '大阪':['道顿堀','大阪城','通天阁','心斋桥','黑门市场','环球影城'],
+      '京都':['金阁寺','岚山竹林','伏见稻荷','哲学之道','祇园花见小路'],
+      '奈良':['东大寺','奈良公园鹿群','春日大社'],
+      '箱根':['大涌谷','芦之湖','箱根温泉区','富士山眺望'],
+      '镰仓':['高德院大佛','鹤岡八幡宫','小町通'],
+      '广岛':['平和纪念公园','严岛神社','宫岛烤牡蛎'],
+      '北海道':['薰衣草农场','小樽运河','函馆夜景','札幌时计台'],
+    },
+    themes:{
+      '亲子':['迪士尼亲子欢乐日','环球影城体验日','动物园科学探索','海边亲子嬉戏','亲子温泉养生'],
+      '蜜月':['祇园漫步与抹茶','岚山竹林双人行','私密温泉浪漫夜','寺庙古道与枯山水'],
+      '摄影':['晨光浅草寺','岚山竹林光影','伏见千本鸟居','函馆百万夜景'],
+      '美食':['筑地市场海鲜早市','道顿堀大食之旅','京都怀石体验','大阪街头小吃'],
+      '购物':['秋叶原电器动漫','心斋桥购物街','免税品集中采购','特色伴手礼扫货'],
+      '自然风光':['富士山日出远眺','岚山竹林与红叶','箱根湖光山色','北海道田园风光'],
+      'default':['东京城市精华','大阪美食文化','京都古都禅意','奈良自然悠游','箱根温泉疗愈','镰仓海滨慢行'],
+    },
+    hotelAreas:{'东京':'新宿·银座·浅草','大阪':'心斋桥·梅田','京都':'祇园·四条','箱根':'汤本·强罗温泉区'},
+  },
+  '韩国':{
+    cities:['首尔','釜山','济州岛','庆州','全州'],
+    highlights:['K-Pop文化体验','韩食烹饪课','北村韩屋村','美妆购物街','汉江夜景','景福宫换岗'],
+    mustSee:{
+      '首尔':['景福宫','北村韩屋村','明洞','弘大街区','南山塔','益善洞'],
+      '釜山':['海云台海滩','广安大桥夜景','甘川文化村','札嘎其海鲜市场'],
+      '济州岛':['城山日出峰','汉拿山','牛岛','涉地可支'],
+    },
+    themes:{
+      '蜜月':['景福宫王朝浪漫','汉江夜景与烧烤','济州日出峰晨光','海云台海滩日落'],
+      '购物':['明洞美妆扫货','弘大潮牌淘宝','免税店集中采购','东大门时尚购物'],
+      'default':['首尔城市初探','K文化沉浸日','古宫历史漫游','海滨休闲放松','美食购物收官'],
+    },
+    hotelAreas:{'首尔':'明洞·江南·弘大','釜山':'海云台·南浦洞','济州岛':'中文旅游区'},
+  },
+  '泰国':{
+    cities:['曼谷','清迈','普吉岛','苏梅岛','芭提雅','清莱'],
+    highlights:['泰式SPA按摩','大皇宫参观','水上市场体验','大象营地互动','浮潜潜水','夜市美食'],
+    mustSee:{
+      '曼谷':['大皇宫','卧佛寺','四面佛','水上市场','考山路','夜间动物园'],
+      '清迈':['素帖寺','古城区','周日夜市','大象自然公园'],
+      '普吉岛':['芭东海滩','攀牙湾游船','皮皮岛一日游','查龙寺'],
+      '苏梅岛':['查汶海滩','纳穆昂瀑布','渔人村'],
+    },
+    themes:{
+      '亲子':['水上乐园亲子日','大象亲子互动','海滩沙堡时光','水族馆探索'],
+      '蜜月':['私人沙滩日落','SPA双人疗愈','浮潜海底探秘','烛光晚餐海景'],
+      '美食':['夜市美食大排档','烹饪课动手学','曼谷美食探访','街头小吃漫游'],
+      'default':['曼谷城市精华','寺庙文化探访','丛林自然探索','海岛慵懒度假','夜市美食收官'],
+    },
+    hotelAreas:{'曼谷':'暹罗·素坤逸·湄南河畔','普吉岛':'卡马拉·拉威','清迈':'古城区附近'},
+  },
+  '法国':{
+    cities:['巴黎','尼斯','里昂','波尔多','普罗旺斯','斯特拉斯堡'],
+    highlights:['埃菲尔铁塔夜景','卢浮宫参观','薰衣草田拍摄','葡萄酒庄品鉴','法式Café','时尚精品购物'],
+    mustSee:{
+      '巴黎':['埃菲尔铁塔','卢浮宫','奥赛博物馆','凡尔赛宫','凯旋门','蒙马特高地'],
+      '尼斯':['英国人大道','老城区','埃兹悬崖村','摩纳哥'],
+      '普罗旺斯':['薰衣草田','戈尔德石头村','教皇新堡'],
+    },
+    themes:{
+      '蜜月':['巴黎浪漫初夜','塞纳河游船夕阳','凡尔赛宫廷漫游','薰衣草田浪漫拍摄'],
+      '摄影':['埃菲尔铁塔晨昏','薰衣草田光影','蒙马特艺术街区','普罗旺斯村庄纪实'],
+      'default':['巴黎城市精华','艺术博物馆日','法式生活体验','酒庄城堡探访','普罗旺斯乡村'],
+    },
+    hotelAreas:{'巴黎':'玛莱区·圣日耳曼·香榭丽舍','尼斯':'英国人大道沿线'},
+  },
+  '意大利':{
+    cities:['罗马','威尼斯','佛罗伦萨','米兰','那不勒斯','阿玛菲'],
+    highlights:['斗兽场参观','梵蒂冈博物馆','贡多拉游览','乌菲兹美术馆','意式冰淇淋','阿玛菲海岸'],
+    mustSee:{
+      '罗马':['斗兽场','梵蒂冈博物馆','西斯廷教堂','特莱维喷泉','西班牙广场'],
+      '威尼斯':['圣马可广场','总督宫','里亚托桥','贡多拉','穆拉诺玻璃岛'],
+      '佛罗伦萨':['乌菲兹美术馆','大教堂广场','米开朗基罗广场'],
+      '阿玛菲':['阿玛菲小镇','波西塔诺','卡普里岛'],
+    },
+    themes:{
+      '蜜月':['罗马浪漫漫步','威尼斯双人贡多拉','阿玛菲悬崖海景','托斯卡纳酒庄'],
+      'default':['罗马古迹精华','梵蒂冈艺术朝圣','文艺复兴探秘','威尼斯水城慢游','海岸度假日'],
+    },
+    hotelAreas:{'罗马':'历史中心·梵蒂冈附近','佛罗伦萨':'阿诺河沿岸','威尼斯':'圣马可·里亚托'},
+  },
+  '新加坡':{
+    cities:['新加坡'],
+    highlights:['滨海湾花园夜景','圣淘沙主题乐园','牛车水历史区','乌节路购物','新加坡动物园','克拉码头'],
+    mustSee:{'新加坡':['滨海湾金沙','花园城市','圣淘沙岛','克拉码头','牛车水','小印度','环球影城','动物园']},
+    themes:{
+      '亲子':['环球影城主题乐园','新加坡动物园亲子','圣淘沙水上乐园','科学博物馆探索'],
+      'default':['城市地标精华','文化街区漫游','滨海花园探索','购物美食天堂','圣淘沙度假'],
+    },
+    hotelAreas:{'新加坡':'滨海湾·乌节路·圣淘沙'},
+  },
+  '马来西亚':{
+    cities:['吉隆坡','槟城','马六甲','沙巴','兰卡威'],
+    highlights:['双子塔观景','峇峇娘惹文化','热带雨林探索','沙巴潜水','马来美食','传统市集'],
+    mustSee:{
+      '吉隆坡':['双子塔','黑风洞','中央市场','茨厂街'],
+      '槟城':['乔治市壁画','极乐寺','姓氏桥','槟城美食街'],
+      '沙巴':['京那巴鲁山','西必洛猩猩保护区'],
+      '马六甲':['荷兰广场','三宝庙','鸡场街'],
+    },
+    themes:{
+      'default':['双子塔城市精华','多元文化街区','热带雨林探索','海岛度假放松','美食文化深探'],
+    },
+    hotelAreas:{'吉隆坡':'KLCC·武吉免登','槟城':'乔治市','沙巴':'亚庇市区'},
+  },
+};
+
+function getDB(dest) {
+  var keys = Object.keys(DEST_DB);
+  for (var i=0;i<keys.length;i++) {
+    var k=keys[i];
+    if (dest.indexOf(k)>=0||k.indexOf(dest)>=0) { var db=Object.assign({},DEST_DB[k]); db.key=k; return db; }
+  }
+  return {key:dest,cities:[dest],highlights:['当地文化体验','特色美食','自然风光','历史遗迹'],mustSee:{},themes:{default:['城市初探','文化深探','休闲漫游','美食购物','自由探索']},hotelAreas:{}};
+}
+
+// ─────────────────────────────────────────────
+// THEME ENGINE
+// ─────────────────────────────────────────────
+var STYLE_THEMES = {
+  '轻松型':['慢游初探','随心漫步','无压力闲逛','度假放空','温柔收尾'],
+  '经典型':['城市精华日','必打卡景点','文化经典游','深入探索','购物留念'],
+  '深度型':['深度文化沉浸','本地人视角','专题聚焦','巷弄寻宝','珍藏记忆'],
+  '高端度假型':['奢华体验日','私人定制日','精品慢活','Fine Dining之夜','悠然离别'],
+  '亲子型':['亲子欢乐初探','儿童主题日','自然科学探索','互动家庭日','轻松收尾'],
+};
+function smartTheme(i, total, style, prefs, db) {
+  if (i===0) return '✈️ 抵达 · 城市初印象';
+  if (i===total-1) return '🛍 自由购物 · 踏上归途';
+  var pref=prefs&&prefs[0]?prefs[0]:'';
+  var prefPool=(db.themes&&db.themes[pref])?db.themes[pref]:(db.themes&&db.themes['default']?db.themes['default']:[]);
+  var stylePool=STYLE_THEMES[style]||STYLE_THEMES['经典型'];
+  var pool=prefPool.concat(stylePool);
+  return pool[(i-1)%pool.length]||stylePool[(i-1)%stylePool.length];
+}
+
+// ─────────────────────────────────────────────
+// RUSH ANALYSIS
+// ─────────────────────────────────────────────
+function analyzeRush(day, style) {
+  var text=[day.morning||'',day.afternoon||'',day.evening||'',day.note||''].join(' ');
+  var commas=(text.match(/[，,、；;]/g)||[]).length;
+  var longTravel=/新干线|高铁|飞机|渡轮|长途|转场|换城/.test(text);
+  var cityChange=day.city!==day.hotel;
+  var score=0;
+  if(commas>7) score+=2; else if(commas>4) score+=1;
+  if(longTravel&&commas>3) score+=1;
+  if(cityChange) score+=1;
+  if(['轻松型','高端度假型','亲子型'].indexOf(style)>=0&&score>=1) score+=1;
+  if(score===0) return {level:'ok',label:'节奏适中',tip:''};
+  if(score<=1) return {level:'warn',label:'略显紧张',tip:'可考虑减少1个景点'};
+  return {level:'danger',label:'⚠ 行程过赶',tip:'景点过多或含长途转场，建议精简'};
+}
+
+
+// ─────────────────────────────────────────────
+// MUST-SEE PARSER & SIMPLE ROUTE GROUPING
+// ─────────────────────────────────────────────
+function splitMustSee(text) {
+  return (text || '')
+    .split(/[，,、；;\n\r]+/)
+    .map(function(s){ return s.trim(); })
+    .filter(Boolean);
+}
+
+function containsAny(text, words) {
+  for (var i=0;i<words.length;i++) {
+    if (text.indexOf(words[i]) >= 0) return true;
+  }
+  return false;
+}
+
+function groupMustSeeByRoute(list, destination) {
+  var groups = [];
+  var used = {};
+  function pick(label, words, note, longDay) {
+    var items = list.filter(function(x){ return !used[x] && containsAny(x, words); });
+    if (items.length) {
+      items.forEach(function(x){ used[x] = true; });
+      groups.push({label:label, items:items, note:note || '', longDay:!!longDay});
+    }
+  }
+
+  var dest = destination || '';
+  var joined = list.join('、');
+
+  // ── 通用远郊/跨城关键词：优先单独安排，避免和市区硬拼 ──
+  pick('远郊/跨城单日', ['长城','慕田峪','八达岭','司马台','古北水镇','富士山','河口湖','箱根','日光','白川乡','五箇山','上高地','立山黑部','奥入濑','青森','小樽','登别','洞爷湖','美瑛','富良野','羊角村','国王湖','新天鹅堡','楚格峰','五渔村','比萨','锡耶纳','圣吉米尼亚诺','托斯卡纳','庞贝','卡普里','阿玛菲','波西塔诺','凡尔赛','吉维尼','圣米歇尔山','埃兹','摩纳哥','牛岛','汉拿山','城山日出峰','攀牙湾','皮皮岛','兰卡威','马六甲'], '远郊或跨城景点往返时间较长，建议单独安排一天或减少同日市区景点', true);
+
+  // 北京
+  if (dest.indexOf('北京') >= 0 || /故宫|颐和园|圆明园|鸟巢|水立方|恭王府|天坛|清华|北大/.test(joined)) {
+    pick('故宫中轴线/老城文化', ['故宫','景山','北海','恭王府','什刹海','后海','南锣鼓巷','王府井'], '老城区景点较集中，适合放在同一天慢慢游览');
+    pick('海淀皇家园林/高校片区', ['颐和园','圆明园','清华','北大','北京大学','清华大学'], '颐和园、圆明园与高校片区顺路，建议安排同一天');
+    pick('奥林匹克公园片区', ['鸟巢','水立方','奥林匹克','奥森','奥林匹克公园'], '鸟巢、水立方、奥林匹克公园相邻，适合傍晚看夜景');
+    pick('天坛/前门片区', ['天坛','前门','大栅栏','天安门','国家博物馆'], '天坛、前门、大栅栏可按南城方向顺路安排');
+  }
+
+  // 日本：东京/京都/大阪/奈良/镰仓/箱根/北海道/九州常见分区
+  if (/日本|东京|大阪|京都|奈良|镰仓|箱根|北海道|札幌|福冈/.test(dest + joined)) {
+    pick('东京东侧/下町文化', ['浅草','浅草寺','晴空塔','上野','秋叶原','两国','隅田川'], '东京东侧景点相对顺路，适合安排为下町文化一日');
+    pick('东京西侧/潮流购物', ['涩谷','原宿','表参道','明治神宫','新宿','代官山','惠比寿'], '涩谷、原宿、表参道、新宿适合同日安排，购物和城市体验集中');
+    pick('东京湾/亲子娱乐', ['迪士尼','台场','丰洲','teamLab','有明','银座','筑地'], '东京湾与银座/筑地可根据酒店位置组合，亲子项目建议预留完整时段');
+    pick('京都东山/祇园', ['清水寺','三年坂','二年坂','八坂神社','祇园','花见小路','高台寺','知恩院'], '京都东山与祇园顺路，适合步行串联');
+    pick('京都岚山片区', ['岚山','竹林','天龙寺','渡月桥','嵯峨野'], '岚山片区建议单独半天到一天，避免与东山硬拼');
+    pick('京都北部/金阁寺', ['金阁寺','龙安寺','仁和寺','北野天满宫'], '京都北部寺院可顺路安排');
+    pick('伏见/宇治/奈良方向', ['伏见稻荷','宇治','平等院','奈良','东大寺','春日大社','奈良公园'], '伏见、宇治、奈良属于南向动线，可根据天数合并或拆分');
+    pick('大阪市区', ['大阪城','道顿堀','心斋桥','黑门市场','通天阁','新世界','梅田','难波'], '大阪市区景点和美食街区集中，适合一日轻松安排');
+    pick('镰仓/湘南片区', ['镰仓','江之岛','湘南','高德院','镰仓大佛','鹤冈八幡宫','小町通'], '镰仓与江之岛适合单独一日慢游');
+    pick('北海道札幌/小樽', ['札幌','大通公园','狸小路','白色恋人','小樽','小樽运河'], '札幌与小樽可按半日/一日组合，冬季注意交通时间');
+  }
+
+  // 意大利：罗马/佛罗伦萨/威尼斯/米兰/南意
+  if (/意大利|罗马|佛罗伦萨|威尼斯|米兰|那不勒斯|阿玛菲/.test(dest + joined)) {
+    pick('罗马古城核心', ['斗兽场','古罗马广场','帕拉蒂尼山','威尼斯广场','真理之口'], '罗马古迹核心区适合同日安排，建议提前预约斗兽场');
+    pick('罗马喷泉/广场漫步', ['特莱维','许愿池','西班牙广场','万神殿','纳沃纳','鲜花广场'], '罗马喷泉与广场适合步行串联，适合下午到傍晚');
+    pick('梵蒂冈片区', ['梵蒂冈','圣彼得','西斯廷','梵蒂冈博物馆','圣天使堡'], '梵蒂冈片区建议预留半天以上，热门日期必须预约');
+    pick('佛罗伦萨核心区', ['乌菲兹','学院美术馆','圣母百花','老桥','领主广场'], '佛罗伦萨核心景点步行可达，适合文艺复兴主题日');
+    pick('威尼斯主岛', ['圣马可','总督宫','里亚托','叹息桥','贡多拉'], '威尼斯主岛景点集中，适合步行和贡多拉体验');
+    pick('威尼斯离岛', ['穆拉诺','布拉诺','彩色岛','玻璃岛'], '威尼斯离岛需搭船，建议预留半天以上');
+    pick('米兰城市核心', ['米兰大教堂','埃马努埃莱','斯福尔扎','最后的晚餐','布雷拉'], '米兰核心区适合城市文化和购物组合');
+  }
+
+  // 法国：巴黎/南法/普罗旺斯
+  if (/法国|巴黎|尼斯|普罗旺斯|波尔多|里昂/.test(dest + joined)) {
+    pick('巴黎右岸经典', ['卢浮宫','杜乐丽','协和广场','香榭丽舍','凯旋门','歌剧院','老佛爷'], '巴黎右岸经典景点可顺路安排，购物和地标集中');
+    pick('巴黎左岸/艺术文化', ['奥赛','荣军院','罗丹','圣日耳曼','卢森堡','先贤祠'], '巴黎左岸适合艺术博物馆和街区漫步');
+    pick('巴黎铁塔/塞纳河', ['埃菲尔','夏乐宫','战神广场','塞纳河','游船'], '埃菲尔铁塔与塞纳河适合傍晚和夜景安排');
+    pick('蒙马特片区', ['蒙马特','圣心堂','小丘广场','红磨坊'], '蒙马特适合半日慢游，注意上下坡和人流');
+    pick('南法海岸', ['尼斯','埃兹','摩纳哥','戛纳','昂蒂布'], '南法海岸点位较分散，建议按海岸线顺路安排');
+    pick('普罗旺斯村庄', ['阿维尼翁','戈尔德','鲁西永','泉水镇','瓦朗索勒','薰衣草'], '普罗旺斯村庄适合包车顺路串联，季节性强需确认花期');
+  }
+
+  // 韩国
+  if (/韩国|首尔|釜山|济州/.test(dest + joined)) {
+    pick('首尔古宫/韩屋', ['景福宫','昌德宫','北村','三清洞','仁寺洞','青瓦台'], '首尔古宫与韩屋村相邻，适合韩服和文化体验');
+    pick('首尔购物潮流', ['明洞','弘大','梨大','东大门','江南','狎鸥亭','圣水洞'], '购物与潮流街区建议按区域拆分，避免跨城过多');
+    pick('首尔夜景/汉江', ['南山塔','汉江','盘浦','乐天世界塔'], '夜景项目适合安排在傍晚以后');
+    pick('釜山海岸线', ['海云台','广安里','广安大桥','海东龙宫寺','青沙浦'], '釜山海岸线适合顺路安排，傍晚看海景夜景');
+    pick('釜山老城/市场', ['甘川文化村','札嘎其','BIFF','南浦洞','松岛'], '釜山老城与市场集中，适合美食文化一日');
+    pick('济州东线', ['城山日出峰','涉地可支','牛岛','月汀里'], '济州东线点位集中，牛岛需预留船班时间');
+    pick('济州西线/南线', ['涯月','中文','柱状节理','山茶花之丘','泰迪熊','绿茶博物馆'], '济州西线/南线适合包车顺路安排');
+  }
+
+  // 新加坡/马来西亚/泰国
+  if (/新加坡|马来西亚|吉隆坡|槟城|泰国|曼谷|清迈|普吉/.test(dest + joined)) {
+    pick('新加坡滨海湾', ['滨海湾','金沙','鱼尾狮','滨海湾花园','摩天轮','克拉码头'], '滨海湾地标集中，适合下午到夜景安排');
+    pick('新加坡圣淘沙', ['圣淘沙','环球影城','海洋馆','水上探险','西乐索'], '圣淘沙项目耗时较长，亲子建议单独一天');
+    pick('新加坡文化街区', ['牛车水','小印度','甘榜格南','哈aji巷','乌节路'], '文化街区可按地铁动线串联，购物可放乌节路');
+    pick('吉隆坡市区', ['双子塔','KLCC','独立广场','茨厂街','中央市场','武吉免登'], '吉隆坡市区景点和购物集中，适合同日安排');
+    pick('槟城乔治市', ['乔治市','壁画','姓氏桥','极乐寺','升旗山'], '槟城乔治市适合步行慢游，升旗山可安排傍晚');
+    pick('曼谷王宫/老城', ['大皇宫','玉佛寺','卧佛寺','郑王庙','湄南河'], '曼谷老城寺庙集中，注意着装和高温');
+    pick('曼谷购物/夜市', ['暹罗','CentralWorld','四面佛','乍都乍','夜市','ICONSIAM'], '曼谷购物商圈可集中安排，夜市放傍晚以后');
+    pick('清迈古城/自然', ['清迈古城','素帖山','宁曼路','大象','夜市'], '清迈古城与宁曼路适合慢游，大象营建议单独半天');
+    pick('普吉海岛/海滩', ['普吉','芭东','卡伦','卡塔','查龙寺','神仙半岛'], '普吉海滩与出海项目注意天气和船班');
+  }
+
+  // 欧洲通用城市逻辑：老城/博物馆/购物/夜景
+  pick('老城核心/历史街区', ['老城','古城','大教堂','市政厅','广场','城堡','皇宫','王宫','教堂','钟楼'], '老城核心景点通常适合步行串联，建议安排为同一主题日');
+  pick('博物馆/艺术主题', ['博物馆','美术馆','画廊','艺术馆','展览','宫殿'], '博物馆类项目耗时较长，建议提前预约并控制同日数量');
+  pick('购物/美食街区', ['购物','奥莱','奥特莱斯','商场','市场','夜市','步行街','美食街'], '购物和美食街区适合放在下午或晚上，作为轻松收尾');
+  pick('自然风光/户外', ['湖','山','雪山','峡湾','海岸','海滩','公园','花园','瀑布','缆车','观景台'], '自然风光类项目受天气影响较大，建议保留弹性时间');
+
+  // 通用兜底：未识别的景点，每2个为一组，避免堆在同一天
+  var rest = list.filter(function(x){ return !used[x]; });
+  for (var i=0;i<rest.length;i+=2) {
+    groups.push({label:'必打卡景点', items:rest.slice(i,i+2), note:'根据客户必打卡需求安排，出发前建议再次核对开放时间', longDay:false});
+  }
+  return groups;
+}
+function distributeMustSee(groups, days) {
+  var plan = [];
+  for (var i=0;i<days;i++) plan.push([]);
+  if (!groups || !groups.length) return plan;
+
+  var targetDays = [];
+  if (days <= 2) {
+    for (var a=0;a<days;a++) targetDays.push(a);
+  } else {
+    for (var b=1;b<days-1;b++) targetDays.push(b); // 默认避开首尾抵达/返程日
+    if (!targetDays.length) targetDays = [0];
+  }
+
+  var pos = 0;
+  groups.forEach(function(g){
+    var placed = false;
+    if (g.longDay) {
+      // 尽量给长城/远郊景点找一个空白日
+      for (var i=0;i<targetDays.length;i++) {
+        var idx = targetDays[i];
+        if (plan[idx].length === 0) { plan[idx].push(g); placed = true; break; }
+      }
+    }
+    if (!placed) {
+      var best = targetDays[pos % targetDays.length];
+      // 尽量不要让同一天超过3个主要景点
+      for (var j=0;j<targetDays.length;j++) {
+        var cand = targetDays[(pos+j) % targetDays.length];
+        var count = plan[cand].reduce(function(sum,x){ return sum + x.items.length; }, 0);
+        if (count + g.items.length <= 3) { best = cand; pos = pos+j; break; }
+      }
+      plan[best].push(g);
+      pos++;
+    }
+  });
+  return plan;
+}
+
+function buildMustSeeDayText(groups, fallback1, fallback2) {
+  if (!groups || !groups.length) return null;
+  var items = [];
+  var notes = [];
+  groups.forEach(function(g){
+    items = items.concat(g.items);
+    if (g.note) notes.push(g.note);
+  });
+  var morningItems = items.slice(0, Math.min(2, items.length));
+  var afternoonItems = items.slice(morningItems.length);
+  if (!afternoonItems.length && fallback2) afternoonItems = [fallback2];
+  var tooMany = items.length >= 4;
+  var hasGreatWall = items.some(function(x){ return /长城|慕田峪|八达岭|司马台|古北/.test(x); });
+  return {
+    morning: '出发前往' + morningItems.join('、') + '，按顺路动线游览',
+    afternoon: afternoonItems.length ? ('继续游览' + afternoonItems.join('、') + '，中途安排休息或简餐') : ('根据体力补充游览' + (fallback1 || '周边景点')),
+    note: (notes.join('；') || '必打卡景点已按顺路和节奏分散安排') + (tooMany ? '；当天景点较多，建议根据体力删减' : '') + (hasGreatWall ? '；长城建议单独安排一天，避免与市区景点硬拼' : '')
+  };
+}
+
+// ─────────────────────────────────────────────
+// GENERATOR
+// ─────────────────────────────────────────────
+function generateItinerary(form) {
+  var db=getDB(form.destination);
+  var days=Math.max(1,parseInt(form.days)||7);
+  var cities=db.cities||[form.destination];
+  var route;
+  if(days<=3) route=[cities[0]];
+  else if(days<=5) route=cities.slice(0,2);
+  else if(days<=8) route=cities.slice(0,3);
+  else route=cities.slice(0,4);
+
+  var dayCities=[];
+  var dpc=Math.floor(days/route.length);
+  for(var ci=0;ci<route.length;ci++){
+    var cnt=ci===route.length-1?days-dayCities.length:dpc;
+    for(var j=0;j<cnt;j++) dayCities.push(route[ci]);
+  }
+
+  var sd=form.startDate?new Date(form.startDate):new Date();
+  var mustSeeList = splitMustSee(form.mustSee);
+  var mustSeeGroups = groupMustSeeByRoute(mustSeeList, form.destination);
+  var mustSeePlan = distributeMustSee(mustSeeGroups, days);
+  var result=[];
+  for(var i=0;i<days;i++){
+    var d=new Date(sd); d.setDate(sd.getDate()+i);
+    var city=dayCities[i]||form.destination;
+    var allAttrs=(db.mustSee&&db.mustSee[city])?db.mustSee[city]:
+      (db.mustSee&&Object.keys(db.mustSee).length>0?db.mustSee[Object.keys(db.mustSee)[0]]:['当地景点']);
+    var attrs=form.avoidPlaces?allAttrs.filter(function(a){return a.indexOf(form.avoidPlaces.trim())<0;}):allAttrs;
+    if(!attrs.length) attrs=allAttrs;
+    var isFirst=i===0,isLast=i===days-1;
+    var pref=form.preferences&&form.preferences[0]?form.preferences[0]:'';
+    var theme=smartTheme(i,days,form.style,form.preferences,db);
+    var a1=attrs[i%Math.max(attrs.length,1)]||'当地特色景点';
+    var a2=attrs[(i+1)%Math.max(attrs.length,1)]||'周边街区';
+    var todayMustSee = buildMustSeeDayText(mustSeePlan[i], a1, a2);
+    var morning,afternoon,evening,note;
+
+    if(isFirst){
+      morning='航班抵达'+city+'，办理入境，前往酒店 check-in';
+      afternoon='稍作休整后步行探索酒店附近，感受'+city+'第一印象';
+      evening=pref==='蜜月'?'烛光晚餐，开启甜蜜'+form.destination+'之旅 ❤️':'前往当地知名餐厅，品尝地道'+form.destination+'美食';
+      note='建议提前网上值机；到达后先休息调时差，首日不排重度行程';
+    } else if(isLast){
+      morning='酒店早餐后整理行李，退房行李寄存，最后自由时光';
+      afternoon=pref==='购物'?'最后的免税店/商圈扫货，采购特产伴手礼':'轻松逛逛周边，购买特产';
+      evening='前往机场，办理值机手续，搭乘航班返回'+form.departure;
+      note='请提前3小时到机场；注意液体物品规定；确认手提行李尺寸';
+    } else {
+      if (todayMustSee) {
+        morning = todayMustSee.morning + (pref==='摄影'?'，把握晨光黄金摄影时段':'');
+        afternoon = todayMustSee.afternoon + (pref==='购物'?'，可顺路安排附近商圈':'') + (pref==='美食'?'，探访当地特色小食':'');
+        note = todayMustSee.note + '；景点开放时间出发前再次确认';
+      } else {
+        morning='出发前往'+a1+(pref==='摄影'?'，把握晨光黄金摄影时段':'');
+        if(['轻松型','高端度假型'].indexOf(form.style)>=0){
+          afternoon='漫步'+a2+'附近，随心探索，不赶时间';
+        } else {
+          afternoon='游览'+a2+(pref==='购物'?'，逛附近商圈':'')+(pref==='美食'?'，探访当地特色小食':'');
+        }
+        note=form.style==='深度型'?'建议提前预约导览；参观前研究景点背景更有深度'
+            :'景点开放时间出发前再次确认；热门景点避开正午';
+      }
+      evening=pref==='美食'?'前往'+city+'知名夜市或餐厅，深度感受当地风味'
+             :pref==='蜜月'?'浪漫晚餐，漫步夜景区，享受两人时光 ✨'
+             :'自由安排，可前往夜市或早归休息';
+    }
+    result.push({
+      id:'d'+(i+1)+'-'+Math.random().toString(36).slice(2,6),
+      day:i+1,
+      date:d.toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'short'}),
+      city:city,theme:theme,morning:morning,afternoon:afternoon,evening:evening,
+      transport:form.transport,hotel:city,note:note,
+    });
+  }
+
+  var ed=new Date(sd); ed.setDate(sd.getDate()+days-1);
+  var slbl={轻松型:'漫游',经典型:'经典',深度型:'深度探索',高端度假型:'奢享',亲子型:'亲子'}[form.style]||'';
+  var aud=(form.adults>0&&form.children>0)?form.adults+'大'+form.children+'小亲子家庭'
+         :(form.preferences&&form.preferences.indexOf('蜜月')>=0)?'蜜月情侣':form.adults+'位旅行者';
+  var overview={
+    title:form.destination+' '+days+'日'+slbl+'之旅',
+    dateRange:sd.toLocaleDateString('zh-CN')+' — '+ed.toLocaleDateString('zh-CN'),
+    route:form.departure+' → '+route.join(' → ')+' → '+form.departure,
+    audience:aud,
+    highlights:(db.highlights||[]).slice(0,5),
+  };
+  var designNotes={
+    route:'以'+route.join('→')+'为主轴，'+days+'天覆盖'+form.destination+'最具代表性区域，减少无效转场。',
+    hotel:'住宿选择'+route.map(function(c){return(db.hotelAreas&&db.hotelAreas[c])||c+'市中心';}).join('、')+'区域，步行可达核心景区。',
+    pacing:'风格定为「'+form.style+'」，'+({轻松型:'每日≤2个主要景点，保留充足自由时间',经典型:'平衡必打卡与自由活动，核心不遗漏',深度型:'聚焦1-2主题深入，搭配专业导览',高端度假型:'以精品酒店为中心辐射，强调品质',亲子型:'严格控制节奏，保证儿童午休'}[form.style]||'')+'。',
+    match:'充分考虑「'+(form.preferences&&form.preferences.length?form.preferences.join('/'):'无特殊')+'」偏好'+(form.mustSee?'，将"'+form.mustSee+'"列为重点':'')+'。',
+  };
+  return {overview:overview,days:result,designNotes:designNotes,clientMsg:buildClientMsg(form,overview,result,db)};
+}
+
+function buildClientMsg(form,ov,days,db){
+  var g=(form.preferences&&form.preferences.indexOf('蜜月')>=0)
+    ?'亲爱的，为您和另一半精心设计了这份 '+form.days+' 天'+form.destination+'蜜月行程 💕'
+    :form.children>0
+    ?'您好！为您全家定制了这份 '+form.days+' 天'+form.destination+'亲子行程 🌟'
+    :'您好！根据您的需求，为您量身定制了这份 '+form.days+' 天'+form.destination+'行程 ✈️';
+  var sd={轻松型:'全程节奏宽松，无需赶路',经典型:'精选经典必游，高效不遗漏',深度型:'深度沉浸，超越普通游客的体验',高端度假型:'精品住宿+私人安排，每个细节都是享受',亲子型:'专为家庭设计，大人孩子都轻松开心'}[form.style]||'';
+  var hls=(db.highlights||[]).slice(0,3).join('、');
+  var dayList=days.map(function(d){return 'Day'+d.day+'  '+d.city+' | '+d.theme;}).join('\n');
+  return g+'\n\n📍 行程概览\n路线：'+ov.route+'\n日期：'+ov.dateRange+'\n人数：成人 '+form.adults+' 人'+(form.children>0?'，儿童 '+form.children+' 人':'')+'\n\n✨ 行程亮点\n• '+sd+'\n• 精选体验：'+hls+'\n• 住宿安排在核心区域，交通便利\n• 全程'+form.transport+'，舒适省心\n\n📅 行程一览\n'+dayList+'\n\n以上是初步方案，如有任何想法欢迎随时告诉我 🙌';
+}
+
+function buildFullText(it){
+  var ov=it.overview;
+  var lines=['【'+ov.title+'】','','━━━ 行程总览 ━━━','日期：'+ov.dateRange,'路线：'+ov.route,'适合：'+ov.audience,'亮点：'+ov.highlights.join('、'),'','━━━ 每日行程 ━━━'];
+  it.days.forEach(function(d){
+    lines.push('','Day '+d.day+'  '+d.date+'  '+d.city,'主题：'+d.theme,'上午：'+d.morning,'下午：'+d.afternoon,'晚上：'+d.evening,'交通：'+d.transport+'  住宿：'+d.hotel);
+    if(d.note) lines.push('备注：'+d.note);
+  });
+  lines.push('','━━━ 设计思路（内部）━━━',it.designNotes.route,it.designNotes.hotel,it.designNotes.pacing,it.designNotes.match);
+  return lines.join('\n');
+}
+
+// ─────────────────────────────────────────────
+// COPY UTIL  (clipboard + fallback)
+// ─────────────────────────────────────────────
+function useCopy(getText){
+  var s=useState(false); var done=s[0]; var setDone=s[1];
+  var go=function(){
+    var t=typeof getText==='function'?getText():getText;
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){setDone(true);setTimeout(function(){setDone(false);},2000);});
+    } else {
+      var ta=document.createElement('textarea');
+      ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.focus();ta.select();
+      try{document.execCommand('copy');}catch(e){}
+      document.body.removeChild(ta);
+      setDone(true);setTimeout(function(){setDone(false);},2000);
+    }
+  };
+  return {done:done,go:go};
+}
+
+// ─────────────────────────────────────────────
+// UI HELPERS
+// ─────────────────────────────────────────────
+var F='Noto Sans SC,sans-serif';
+var FM='IBM Plex Mono,monospace';
+
+function lbl(text){
+  return h('div',{style:{fontSize:'10px',color:C.textSub,fontFamily:FM,textTransform:'uppercase',letterSpacing:'.07em',marginBottom:'5px'}},text);
+}
+function secTitle(text){
+  return h('div',{style:{fontSize:'11px',color:C.accentText,fontFamily:FM,textTransform:'uppercase',letterSpacing:'.1em',marginBottom:'8px',display:'flex',alignItems:'center',gap:'5px'}},
+    h('div',{style:{width:'3px',height:'11px',background:C.accent,borderRadius:'2px',flexShrink:0}}),text
+  );
+}
+function card(children,mb){
+  return h('div',{style:{background:C.surface,border:'1px solid '+C.border,borderRadius:'8px',padding:'11px',marginBottom:(mb||12)+'px',boxShadow:'0 1px 2px rgba(0,0,0,.04)'}},children);
+}
+
+// ─────────────────────────────────────────────
+// TAG PICKER
+// ─────────────────────────────────────────────
+function TagPicker(props){
+  var options=props.options,value=props.value,onChange=props.onChange,multi=props.multi!==false;
+  function toggle(opt){
+    if(!multi){onChange(opt===value?'':opt);return;}
+    if(value.indexOf(opt)>=0) onChange(value.filter(function(v){return v!==opt;}));
+    else onChange(value.concat([opt]));
+  }
+  return h('div',{style:{display:'flex',flexWrap:'wrap',gap:'5px'}},
+    options.map(function(opt){
+      var active=multi?value.indexOf(opt)>=0:value===opt;
+      return h('span',{key:opt,onClick:function(){toggle(opt);},style:{
+        padding:'3px 10px',borderRadius:'4px',fontSize:'12px',cursor:'pointer',userSelect:'none',
+        border:'1px solid',transition:'all .12s',
+        background:active?C.tagActiveBg:'#f8fafc',
+        borderColor:active?C.tagActiveBorder:C.border,
+        color:active?C.tagActiveText:C.textMid,
+        fontWeight:active?'500':'400',
+      }},opt);
+    })
+  );
+}
+
+// ─────────────────────────────────────────────
+// FORM INPUT
+// ─────────────────────────────────────────────
+function FInput(props){
+  var label=props.label,value=props.value,onChange=props.onChange,type=props.type||'text';
+  var rest={};
+  if(props.min!==undefined) rest.min=props.min;
+  if(props.max!==undefined) rest.max=props.max;
+  if(props.placeholder) rest.placeholder=props.placeholder;
+  var s=useState(C.inputBorder); var bc=s[0]; var setBc=s[1];
+  return h('div',null,
+    label?lbl(label):null,
+    h('input',Object.assign({type:type,value:value,
+      onChange:function(e){onChange(e.target.value);},
+      onFocus:function(){setBc(C.inputFocus);},
+      onBlur:function(){setBc(C.inputBorder);},
+      style:{width:'100%',background:C.inputBg,border:'1px solid '+bc,borderRadius:'5px',color:C.text,padding:'7px 9px',fontSize:'12px',outline:'none',fontFamily:F,transition:'border-color .15s'}
+    },rest))
+  );
+}
+
+// ─────────────────────────────────────────────
+// FIELD BOX (editable textarea inside day card)
+// ─────────────────────────────────────────────
+function FieldBox(props){
+  var label=props.label,value=props.value,onChange=props.onChange,rows=props.rows||3;
+  var fs=useState(false); var focused=fs[0]; var setFocused=fs[1];
+  return h('div',null,
+    h('div',{style:{fontSize:'10px',color:focused?C.accent:C.textSub,fontFamily:FM,textTransform:'uppercase',letterSpacing:'.06em',marginBottom:'4px',transition:'color .15s'}},label),
+    h('div',{style:{background:focused?'#f0f9ff':C.inputBg,border:'1px solid '+(focused?C.inputFocus:C.border),borderRadius:'6px',padding:'7px 9px',transition:'all .15s'}},
+      h('textarea',{value:value,onChange:function(e){onChange(e.target.value);},rows:rows,
+        onFocus:function(){setFocused(true);},onBlur:function(){setFocused(false);},
+        style:{background:'transparent',border:'none',outline:'none',width:'100%',color:C.text,fontFamily:F,fontSize:'12px',resize:'vertical',lineHeight:'1.7'}})
+    )
+  );
+}
+
+// ─────────────────────────────────────────────
+// COPY BUTTON
+// ─────────────────────────────────────────────
+function CopyBtn(props){
+  var c=useCopy(props.getText);
+  return h('button',{onClick:c.go,style:Object.assign({
+    display:'inline-flex',alignItems:'center',gap:'5px',padding:'6px 12px',borderRadius:'5px',
+    fontSize:'12px',fontWeight:'500',cursor:'pointer',border:'1px solid',outline:'none',fontFamily:F,whiteSpace:'nowrap',
+  },props.style||{})},c.done?'✓ 已复制':props.children);
+}
+
+// ─────────────────────────────────────────────
+// RUSH BAR
+// ─────────────────────────────────────────────
+function RushBar(props){
+  var days=props.days,style=props.style;
+  var issues=days.map(function(d){var r=analyzeRush(d,style);r.day=d.day;r.theme=d.theme;return r;}).filter(function(r){return r.level!=='ok';});
+  if(!issues.length) return h('div',{style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 12px',background:'#f0fdf4',border:'1px solid #bbf7d0',borderRadius:'7px',marginBottom:'10px',fontSize:'12px',color:'#15803d'}},
+    '✓ 全程节奏良好，无明显过赶问题'
+  );
+  return h('div',{style:{padding:'9px 12px',background:'#fffbeb',border:'1px solid #fde68a',borderRadius:'7px',marginBottom:'10px'}},
+    h('div',{style:{fontSize:'11px',color:'#b45309',fontWeight:'600',marginBottom:'5px'}},'⚠ 行程节奏提醒（'+issues.length+' 天需注意）'),
+    issues.map(function(r){
+      return h('div',{key:r.day,style:{display:'flex',alignItems:'center',gap:'8px',marginBottom:'3px'}},
+        h('span',{className:'rush-'+r.level},'Day'+r.day),
+        h('span',{style:{fontSize:'11px',color:C.textMid}},r.theme),
+        h('span',{style:{fontSize:'11px',color:C.textSub}},'— '+r.tip)
+      );
+    })
+  );
+}
+
+// ─────────────────────────────────────────────
+// DAY CARD
+// ─────────────────────────────────────────────
+function DayCard(props){
+  var day=props.day,idx=props.idx,total=props.total,style=props.style;
+  var os=useState(true); var open=os[0]; var setOpen=os[1];
+  function u(k,v){var patch={};patch[k]=v;props.onUpdate(idx,Object.assign({},day,patch));}
+  var rush=analyzeRush(day,style);
+
+  // Header bg: very light blue tint
+  var hdrBg='#f8fafc';
+
+  return h('div',{className:'day-card fu'},
+    // ── Header ──
+    h('div',{style:{display:'flex',alignItems:'center',gap:'8px',padding:'9px 12px',background:hdrBg,borderBottom:open?'1px solid '+C.border:'none',userSelect:'none'}},
+      // Up / Down
+      h('div',{style:{display:'flex',flexDirection:'column',gap:'0px',flexShrink:0}},
+        h('button',{onClick:function(){props.onMoveUp(idx);},disabled:idx===0,style:{background:'none',border:'none',cursor:idx===0?'not-allowed':'pointer',color:idx===0?C.textFaint:C.textSub,padding:'1px 3px',fontSize:'11px',lineHeight:1}},'▲'),
+        h('button',{onClick:function(){props.onMoveDown(idx);},disabled:idx===total-1,style:{background:'none',border:'none',cursor:idx===total-1?'not-allowed':'pointer',color:idx===total-1?C.textFaint:C.textSub,padding:'1px 3px',fontSize:'11px',lineHeight:1}},'▼')
+      ),
+      // Day badge
+      h('span',{style:{fontFamily:FM,fontSize:'11px',fontWeight:'600',color:C.accentText,background:C.accentBg,border:'1px solid '+C.accentBorder,padding:'2px 8px',borderRadius:'4px',flexShrink:0,minWidth:'48px',textAlign:'center'}},'DAY '+day.day),
+      // Date
+      h('span',{style:{fontSize:'10px',color:C.textSub,fontFamily:FM,flexShrink:0}},day.date),
+      // City (editable)
+      h('div',{style:{display:'flex',alignItems:'center',gap:'3px',flexShrink:0}},
+        h('span',{style:{fontSize:'11px'}},'📍'),
+        h('input',{value:day.city,onChange:function(e){u('city',e.target.value);},style:{background:'transparent',border:'none',outline:'none',color:C.accent,fontSize:'12px',fontWeight:'600',width:'55px',fontFamily:F}})
+      ),
+      h('span',{style:{color:C.border,flexShrink:0}},'·'),
+      // Theme (editable)
+      h('div',{style:{flex:1,minWidth:0}},
+        h('input',{value:day.theme,onChange:function(e){u('theme',e.target.value);},style:{background:'transparent',border:'none',outline:'none',color:C.text,fontSize:'12px',width:'100%',fontFamily:F}})
+      ),
+      // Rush badge
+      h('span',{className:'rush-'+rush.level,style:{flexShrink:0}},rush.label),
+      // Actions
+      h('div',{style:{display:'flex',gap:'2px',flexShrink:0,marginLeft:'4px'}},
+        h('button',{onClick:function(){props.onAddAfter(idx);},title:'在此天后新增一天',style:{background:'none',border:'none',cursor:'pointer',color:C.textSub,padding:'3px 6px',fontSize:'15px',lineHeight:1}},'+'),
+        total>1?h('button',{onClick:function(){props.onDelete(idx);},title:'删除此天',style:{background:'none',border:'none',cursor:'pointer',color:'#fca5a5',padding:'3px 6px',fontSize:'15px',lineHeight:1}},'×'):null,
+        h('button',{onClick:function(){setOpen(function(o){return !o;});},style:{background:'none',border:'none',cursor:'pointer',color:C.textSub,padding:'3px 6px',fontSize:'12px',lineHeight:1}},open?'▲':'▼')
+      )
+    ),
+    // ── Body ──
+    open?h('div',{style:{padding:'13px',background:C.surface}},
+      // Meta row
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px',marginBottom:'11px',paddingBottom:'11px',borderBottom:'1px solid '+C.border}},
+        h('div',null,lbl('住宿城市'),
+          h('input',{value:day.hotel,onChange:function(e){u('hotel',e.target.value);},style:{background:'transparent',border:'none',borderBottom:'1px solid '+C.border,outline:'none',color:C.textMid,fontSize:'12px',width:'100%',fontFamily:F,paddingBottom:'2px'}})
+        ),
+        h('div',null,lbl('交通方式'),
+          h('input',{value:day.transport,onChange:function(e){u('transport',e.target.value);},style:{background:'transparent',border:'none',borderBottom:'1px solid '+C.border,outline:'none',color:C.textMid,fontSize:'12px',width:'100%',fontFamily:F,paddingBottom:'2px'}})
+        ),
+        h('div',null,lbl('日期'),
+          h('input',{value:day.date,onChange:function(e){u('date',e.target.value);},style:{background:'transparent',border:'none',borderBottom:'1px solid '+C.border,outline:'none',color:C.textMid,fontSize:'12px',width:'100%',fontFamily:F,paddingBottom:'2px'}})
+        )
+      ),
+      // Schedule
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',marginBottom:'10px'}},
+        h(FieldBox,{label:'🌅 上午安排',value:day.morning,onChange:function(v){u('morning',v);},rows:3}),
+        h(FieldBox,{label:'☀️ 下午安排',value:day.afternoon,onChange:function(v){u('afternoon',v);},rows:3})
+      ),
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}},
+        h(FieldBox,{label:'🌙 晚上安排',value:day.evening,onChange:function(v){u('evening',v);},rows:2}),
+        h(FieldBox,{label:'📝 备注/提示',value:day.note,onChange:function(v){u('note',v);},rows:2})
+      ),
+      // Rush tip
+      rush.level!=='ok'?h('div',{style:{marginTop:'9px',display:'flex',alignItems:'center',gap:'7px',padding:'6px 10px',background:rush.level==='danger'?'#fef2f2':'#fffbeb',borderRadius:'5px',border:'1px solid '+(rush.level==='danger'?'#fecaca':'#fde68a')}},
+        h('span',{style:{fontSize:'14px'}},rush.level==='danger'?'⚠️':'💡'),
+        h('span',{style:{fontSize:'11px',color:rush.level==='danger'?'#991b1b':'#92400e'}},rush.tip)
+      ):null
+    ):null
+  );
+}
+
+// ─────────────────────────────────────────────
+// OVERVIEW BAR
+// ─────────────────────────────────────────────
+function OverviewBar(props){
+  var ov=props.ov,setOv=props.setOv;
+  function u(k,v){var patch={};patch[k]=v;setOv(Object.assign({},ov,patch));}
+  var inputSt={background:'transparent',border:'none',outline:'none',fontFamily:F,fontSize:'12px',color:C.textMid,borderBottom:'1px solid '+C.border,paddingBottom:'2px',width:'100%',transition:'border-color .15s'};
+  return h('div',{style:{background:C.surface,border:'1px solid '+C.border,borderRadius:'10px',padding:'14px',marginBottom:'11px',boxShadow:'0 1px 3px rgba(0,0,0,.05)'}},
+    h('div',{style:{display:'grid',gridTemplateColumns:'2fr 1fr 1fr',gap:'14px',marginBottom:'13px'}},
+      h('div',null,lbl('行程标题'),
+        h('input',{value:ov.title,onChange:function(e){u('title',e.target.value);},style:Object.assign({},inputSt,{color:C.accentText,fontSize:'16px',fontWeight:'600'})})
+      ),
+      h('div',null,lbl('日期范围'),
+        h('input',{value:ov.dateRange,onChange:function(e){u('dateRange',e.target.value);},style:inputSt})
+      ),
+      h('div',null,lbl('适合人群'),
+        h('input',{value:ov.audience,onChange:function(e){u('audience',e.target.value);},style:inputSt})
+      )
+    ),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 2fr',gap:'14px'}},
+      h('div',null,lbl('路线概览'),
+        h('input',{value:ov.route,onChange:function(e){u('route',e.target.value);},style:inputSt})
+      ),
+      h('div',null,lbl('行程亮点（用、分隔）'),
+        h('input',{value:ov.highlights.join('、'),onChange:function(e){u('highlights',e.target.value.split('、').map(function(s){return s.trim();}).filter(Boolean));},style:inputSt})
+      )
+    )
+  );
+}
+
+// ─────────────────────────────────────────────
+// LEFT FORM
+// ─────────────────────────────────────────────
+function LeftForm(props){
+  var form=props.form,setForm=props.setForm,onGenerate=props.onGenerate,loading=props.loading;
+  function u(k,v){setForm(function(p){var patch={};patch[k]=v;return Object.assign({},p,patch);});}
+
+  return h('div',{style:{padding:'14px',overflowY:'auto',height:'100%',background:C.sidebar}},
+    secTitle('基础信息'),
+    card([
+      h('div',{key:'r1',style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px',marginBottom:'8px'}},
+        h(FInput,{key:'sd',label:'出发日期',type:'date',value:form.startDate,onChange:function(v){u('startDate',v);}}),
+        h(FInput,{key:'dy',label:'行程天数',type:'number',value:form.days,onChange:function(v){u('days',v);},min:1,max:30}),
+        h(FInput,{key:'dep',label:'出发城市',value:form.departure,placeholder:'如：上海',onChange:function(v){u('departure',v);}}),
+        h(FInput,{key:'dest',label:'目的地',value:form.destination,placeholder:'如：日本',onChange:function(v){u('destination',v);}})
+      ),
+      h('div',{key:'r2',style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'8px'}},
+        h(FInput,{key:'tot',label:'总人数',type:'number',value:form.total,onChange:function(v){u('total',v);},min:1}),
+        h(FInput,{key:'adt',label:'成人',type:'number',value:form.adults,onChange:function(v){u('adults',v);},min:1}),
+        h(FInput,{key:'chd',label:'儿童',type:'number',value:form.children,onChange:function(v){u('children',v);},min:0})
+      )
+    ]),
+
+    secTitle('客户需求'),
+    card(
+      h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}},
+        h(FInput,{label:'必打卡景点',value:form.mustSee,placeholder:'如：故宫、鸟巢、水立方、颐和园、慕田峪长城…',onChange:function(v){u('mustSee',v);}}),
+        h(FInput,{label:'不想去的地方',value:form.avoidPlaces,placeholder:'如：太商业化…',onChange:function(v){u('avoidPlaces',v);}}),
+        h(FInput,{label:'酒店要求',value:form.hotelReq,placeholder:'如：需要温泉旅馆…',onChange:function(v){u('hotelReq',v);}}),
+        h(FInput,{label:'航班要求',value:form.flightReq,placeholder:'如：不要早于6点…',onChange:function(v){u('flightReq',v);}}),
+        h('div',null,lbl('预算等级'),h(TagPicker,{options:['经济实惠','中等档次','中高端','奢华高端'],value:form.budget,onChange:function(v){u('budget',v);},multi:false})),
+        h('div',null,lbl('客户偏好（可多选）'),h(TagPicker,{options:['亲子','蜜月','摄影','老人','不赶','购物','美食','小众','网红','自然风光'],value:form.preferences,onChange:function(v){u('preferences',v);}})),
+        h('div',null,lbl('交通方式'),h(TagPicker,{options:['包车','公共交通','自驾','混合'],value:form.transport,onChange:function(v){u('transport',v);},multi:false}))
+      )
+    ),
+
+    secTitle('行程风格'),
+    card(h(TagPicker,{options:['轻松型','经典型','深度型','高端度假型','亲子型'],value:form.style,onChange:function(v){u('style',v);},multi:false}),16),
+
+    h('button',{onClick:onGenerate,disabled:loading,style:{
+      width:'100%',background:loading?'#7dd3fc':C.accent,color:'#fff',border:'none',borderRadius:'7px',
+      padding:'11px',fontSize:'13px',fontWeight:'600',cursor:loading?'not-allowed':'pointer',
+      display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',fontFamily:F,
+      boxShadow:'0 2px 8px rgba(14,165,233,.3)',transition:'all .2s',
+    }},loading?'⏳ 生成中…':'⚡ 生成行程')
+  );
+}
+
+// ─────────────────────────────────────────────
+// CLIENT PANEL
+// ─────────────────────────────────────────────
+function ClientPanel(props){
+  var msg=props.msg,setMsg=props.setMsg;
+  return h('div',null,
+    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}},
+      h('div',{style:{fontSize:'13px',fontWeight:'600',color:C.text}},'💬 对客发送版（微信文案）'),
+      h(CopyBtn,{getText:function(){return msg;},style:{background:'#f0fdf4',borderColor:'#86efac',color:'#15803d'}},'复制对客版')
+    ),
+    h('textarea',{value:msg,onChange:function(e){setMsg(e.target.value);},rows:17,style:{
+      width:'100%',background:C.surface,border:'1px solid '+C.border,borderRadius:'7px',
+      color:C.text,padding:'13px',fontSize:'13px',outline:'none',resize:'vertical',fontFamily:F,lineHeight:'1.9',
+      boxShadow:'inset 0 1px 2px rgba(0,0,0,.04)',
+    }})
+  );
+}
+
+// ─────────────────────────────────────────────
+// AUDIT PANEL
+// ─────────────────────────────────────────────
+function AuditPanel(props){
+  var it=props.it,form=props.form;
+  var db=getDB(form.destination);
+  var groups=[
+    {t:'✈️ 航班确认',items:['确认 '+form.departure+'→'+form.destination+' 出发航班（推荐上午到达）','确认 '+form.destination+'→'+form.departure+' 返程航班及行李额度'].concat(form.flightReq?['⚑ 客户要求：'+form.flightReq]:[]),c:'#0369a1',bg:'#f0f9ff',bc:'#bae6fd'},
+    {t:'🏨 酒店确认',items:['确认各城市酒店档次（预算：'+form.budget+'）'].concat(form.hotelReq?['⚑ 客户要求：'+form.hotelReq]:[]).concat(form.children>0?['确认酒店有家庭房或可加床']:[]),c:'#6d28d9',bg:'#faf5ff',bc:'#e9d5ff'},
+    {t:'🎫 门票/预约',items:[(db.highlights||[]).slice(0,1).map(function(hl){return '确认"'+hl+'"是否需要提前预约';}),'旺季行程建议提前锁定热门门票','特殊体验（温泉/导览等）提前订'].flat(),c:'#15803d',bg:'#f0fdf4',bc:'#bbf7d0'},
+    {t:'🔍 人工检查',items:['确认出发日期附近是否有节假日','报价核对后再发送给客户','目的地近期是否有节庆或异常'].concat(form.preferences&&form.preferences.indexOf('摄影')>=0?['确认景点无人机及商拍政策']:[]),c:'#b45309',bg:'#fffbeb',bc:'#fde68a'},
+  ];
+  var dangerDays=it.days.map(function(d){var r=analyzeRush(d,form.style);r.day=d.day;r.theme=d.theme;return r;}).filter(function(r){return r.level==='danger';});
+
+  return h('div',null,
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'9px',marginBottom:'10px'}},
+      groups.map(function(g){
+        return h('div',{key:g.t,style:{background:g.bg,border:'1px solid '+g.bc,borderRadius:'8px',padding:'12px'}},
+          h('div',{style:{fontSize:'12px',fontWeight:'600',color:g.c,marginBottom:'8px'}},g.t),
+          g.items.map(function(item,i){
+            return h('div',{key:i,style:{display:'flex',gap:'6px',marginBottom:'5px',fontSize:'11px',color:C.textMid}},
+              h('span',{style:{color:C.textFaint,flexShrink:0}},'•'),item
+            );
+          })
+        );
+      })
+    ),
+    dangerDays.length>0?h('div',{style:{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:'7px',padding:'10px 13px'}},
+      h('div',{style:{fontSize:'11px',color:'#dc2626',fontWeight:'600',marginBottom:'6px'}},'⚠️ 以下天数行程过赶，建议调整'),
+      dangerDays.map(function(r){return h('div',{key:r.day,style:{fontSize:'11px',color:'#991b1b',marginBottom:'2px'}},'Day'+r.day+' · '+r.theme+' — '+r.tip);})
+    ):null
+  );
+}
+
+// ─────────────────────────────────────────────
+// NOTES PANEL
+// ─────────────────────────────────────────────
+function NotesPanel(props){
+  var notes=props.notes;
+  return h('div',{style:{background:C.surface,border:'1px solid '+C.border,borderRadius:'8px',padding:'16px',boxShadow:'0 1px 3px rgba(0,0,0,.04)'}},
+    [['🗺 路线规划','route'],['🏨 住宿安排','hotel'],['⏱ 节奏控制','pacing'],['✅ 需求匹配','match']].map(function(pair){
+      return notes[pair[1]]?h('div',{key:pair[1],style:{marginBottom:'14px',paddingBottom:'14px',borderBottom:'1px solid '+C.border}},
+        h('div',{style:{fontSize:'11px',color:C.accentText,fontFamily:FM,marginBottom:'5px',textTransform:'uppercase',letterSpacing:'.05em'}},pair[0]),
+        h('div',{style:{fontSize:'13px',color:C.textMid,lineHeight:'1.75'}},notes[pair[1]])
+      ):null;
+    })
+  );
+}
+
+// ─────────────────────────────────────────────
+// EXPORT WORD (.docx)
+// ─────────────────────────────────────────────
+function exportDocx(it, form) {
+  try {
+    var docx = window.docx;
+    var Document    = docx.Document;
+    var Packer      = docx.Packer;
+    var Paragraph   = docx.Paragraph;
+    var TextRun     = docx.TextRun;
+    var Table       = docx.Table;
+    var TableRow    = docx.TableRow;
+    var TableCell   = docx.TableCell;
+    var PageBreak   = docx.PageBreak;
+    var AlignmentType  = docx.AlignmentType;
+    var BorderStyle    = docx.BorderStyle;
+    var WidthType      = docx.WidthType;
+    var ShadingType    = docx.ShadingType;
+    var HeadingLevel   = docx.HeadingLevel;
+    var VerticalAlign  = docx.VerticalAlign;
+
+    var ov = it.overview;
+
+    // ── shared border style ──
+    var bSingle = {style: BorderStyle.SINGLE, size: 4, color: '94a3b8'};
+    var cellBorders = {top:bSingle, bottom:bSingle, left:bSingle, right:bSingle};
+    var noBorder = {style: BorderStyle.NONE, size: 0, color: 'ffffff'};
+    var noBorders = {top:noBorder, bottom:noBorder, left:noBorder, right:noBorder};
+
+    // ── column widths (A4, 2cm margins each side → content ≈ 8892 DXA) ──
+    var TW = 8892; // total table width
+    var LW = 1700; // label column
+    var VW = TW - LW; // value column
+
+    // cell margin
+    var CM = {top:80, bottom:80, left:120, right:120};
+
+    function p(text, opts) {
+      opts = opts || {};
+      return new Paragraph({
+        alignment: opts.align || AlignmentType.LEFT,
+        spacing: {before: opts.before||0, after: opts.after||120},
+        children: [new TextRun({
+          text: text || '',
+          bold: opts.bold || false,
+          size: opts.size || 22,
+          font: 'Arial',
+          color: opts.color || '1e293b',
+        })]
+      });
+    }
+
+    function pEmpty(spacing) {
+      return new Paragraph({spacing:{before:0,after:spacing||120},children:[]});
+    }
+
+    function heading1(text) {
+      return new Paragraph({
+        spacing: {before:360, after:160},
+        border: {bottom: {style:BorderStyle.SINGLE, size:6, color:'0ea5e9', space:1}},
+        children: [new TextRun({text:text, bold:true, size:32, font:'Arial', color:'0369a1'})]
+      });
+    }
+
+    function heading2(text) {
+      return new Paragraph({
+        spacing: {before:240, after:100},
+        children: [new TextRun({text:text, bold:true, size:26, font:'Arial', color:'1e293b'})]
+      });
+    }
+
+    function labelCell(text) {
+      return new TableCell({
+        borders: cellBorders,
+        width: {size:LW, type:WidthType.DXA},
+        margins: CM,
+        shading: {fill:'f0f9ff', type:ShadingType.CLEAR},
+        verticalAlign: VerticalAlign.TOP,
+        children: [new Paragraph({children:[new TextRun({text:text||'', bold:true, size:20, font:'Arial', color:'0369a1'})]})]
+      });
+    }
+
+    function valueCell(text, colWidth) {
+      return new TableCell({
+        borders: cellBorders,
+        width: {size:colWidth||VW, type:WidthType.DXA},
+        margins: CM,
+        verticalAlign: VerticalAlign.TOP,
+        children: [new Paragraph({children:[new TextRun({text:text||'', size:20, font:'Arial', color:'1e293b'})]})]
+      });
+    }
+
+    function twoColRow(label, value) {
+      return new TableRow({children:[labelCell(label), valueCell(value)]});
+    }
+
+    function makeDayTable(day) {
+      var rows = [
+        twoColRow('日期', day.date || ('第'+day.day+'天')),
+        twoColRow('城市', day.city || ''),
+        twoColRow('今日主题', day.theme || ''),
+        twoColRow('上午安排', day.morning || ''),
+        twoColRow('下午安排', day.afternoon || ''),
+        twoColRow('晚上安排', day.evening || ''),
+        twoColRow('交通方式', day.transport || ''),
+        twoColRow('住宿', day.hotel || ''),
+        twoColRow('备注', day.note || ''),
+      ];
+      return new Table({
+        width: {size:TW, type:WidthType.DXA},
+        columnWidths: [LW, VW],
+        rows: rows,
+      });
+    }
+
+    // ── build sections ──
+    var children = [];
+
+    // ════════ 封面 ════════
+    children.push(pEmpty(1440));
+    children.push(new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: {before:0, after:240},
+      children: [new TextRun({text:'✈  旅行定制路书', bold:true, size:52, font:'Arial', color:'0ea5e9'})]
+    }));
+    children.push(new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: {before:0, after:480},
+      children: [new TextRun({text:ov.title || '', bold:true, size:40, font:'Arial', color:'0369a1'})]
+    }));
+
+    // cover info table (no borders, centered)
+    var coverInfoRows = [
+      ['📅 日期', ov.dateRange || ''],
+      ['📍 路线', ov.route || ''],
+      ['👥 出行人', ov.audience || ''],
+    ];
+    var coverCW = [1800, TW - 1800];
+    children.push(new Table({
+      width: {size:TW, type:WidthType.DXA},
+      columnWidths: coverCW,
+      rows: coverInfoRows.map(function(r) {
+        return new TableRow({children:[
+          new TableCell({borders:noBorders, width:{size:coverCW[0],type:WidthType.DXA}, margins:CM,
+            children:[new Paragraph({children:[new TextRun({text:r[0], bold:true, size:22, font:'Arial', color:'475569'})]})]
+          }),
+          new TableCell({borders:noBorders, width:{size:coverCW[1],type:WidthType.DXA}, margins:CM,
+            children:[new Paragraph({children:[new TextRun({text:r[1], size:22, font:'Arial', color:'1e293b'})]})]
+          }),
+        ]});
+      })
+    }));
+    children.push(pEmpty(400));
+    children.push(new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: {before:0, after:0},
+      children: [new TextRun({text:'定制服务 · 专属行程', size:20, font:'Arial', color:'94a3b8'})]
+    }));
+
+    // page break after cover
+    children.push(new Paragraph({children:[new PageBreak()]}));
+
+    // ════════ 行程总览 ════════
+    children.push(heading1('行程总览'));
+    children.push(pEmpty(80));
+
+    var summaryRows = [
+      twoColRow('路线概览', ov.route || ''),
+      twoColRow('行程亮点', (ov.highlights||[]).join('  ·  ')),
+      twoColRow('适合人群', ov.audience || ''),
+    ];
+    children.push(new Table({
+      width:{size:TW,type:WidthType.DXA},
+      columnWidths:[LW,VW],
+      rows: summaryRows,
+    }));
+
+    children.push(new Paragraph({children:[new PageBreak()]}));
+
+    // ════════ 每日行程 ════════
+    children.push(heading1('每日行程详情'));
+
+    it.days.forEach(function(day) {
+      children.push(pEmpty(180));
+      // Day header
+      children.push(new Paragraph({
+        spacing:{before:0, after:100},
+        children:[
+          new TextRun({text:'Day ' + day.day + '   ', bold:true, size:26, font:'Arial', color:'0ea5e9'}),
+          new TextRun({text:(day.date||'') + '   ' + (day.city||''), size:22, font:'Arial', color:'475569'}),
+        ]
+      }));
+      children.push(makeDayTable(day));
+    });
+
+    children.push(new Paragraph({children:[new PageBreak()]}));
+
+    // ════════ 行程设计思路 ════════
+    children.push(heading1('行程设计思路'));
+    children.push(pEmpty(80));
+
+    var notes = it.designNotes || {};
+    var noteItems = [
+      ['路线规划', notes.route || ''],
+      ['住宿安排', notes.hotel || ''],
+      ['节奏控制', notes.pacing || ''],
+      ['需求匹配', notes.match || ''],
+    ];
+    children.push(new Table({
+      width:{size:TW,type:WidthType.DXA},
+      columnWidths:[LW,VW],
+      rows: noteItems.map(function(r){return twoColRow(r[0], r[1]);}),
+    }));
+
+    children.push(pEmpty(240));
+    children.push(new Paragraph({
+      alignment: AlignmentType.RIGHT,
+      spacing:{before:0,after:0},
+      children:[new TextRun({text:'本路书由旅行定制师专属生成 · 版权归属定制服务方', size:18, font:'Arial', color:'cbd5e1'})]
+    }));
+
+    // ── build document ──
+    var doc = new Document({
+      styles: {
+        default: {
+          document: {run:{font:'Arial', size:22, color:'1e293b'}},
+        }
+      },
+      sections: [{
+        properties: {
+          page: {
+            size: {width:11906, height:16838},
+            margin: {top:1134, right:1134, bottom:1134, left:1134},
+          }
+        },
+        children: children,
+      }]
+    });
+
+    // ── pack & download ──
+    Packer.toBlob(doc).then(function(blob) {
+      var today = new Date().toISOString().split('T')[0];
+      var filename = (ov.title || '行程路书') + '_' + today + '.docx';
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      setTimeout(function(){URL.revokeObjectURL(url);}, 3000);
+    }).catch(function(e){
+      console.error('Word导出失败:', e);
+      alert('Word导出失败，请检查控制台错误信息。');
+    });
+
+  } catch(e) {
+    console.error('Word导出错误:', e);
+    alert('Word导出出错：' + e.message);
+  }
+}
+
+// ─────────────────────────────────────────────
+// APP
+// ─────────────────────────────────────────────
+var DEFAULT_FORM={
+  startDate:new Date().toISOString().split('T')[0],
+  days:7,departure:'上海',destination:'日本',
+  total:2,adults:2,children:0,
+  mustSee:'',avoidPlaces:'',hotelReq:'',flightReq:'',
+  budget:'中高端',preferences:['摄影','美食'],transport:'包车',style:'经典型',
+};
+var TABS=[{id:'days',label:'每日行程'},{id:'client',label:'对客文案'},{id:'audit',label:'审核清单'},{id:'notes',label:'设计思路'}];
+
+function App(){
+  var fs=useState(DEFAULT_FORM); var form=fs[0]; var setForm=fs[1];
+  var is=useState(null); var it=is[0]; var setIt=is[1];
+  var ls=useState(false); var loading=ls[0]; var setLoading=ls[1];
+  var ts=useState('days'); var tab=ts[0]; var setTab=ts[1];
+
+  function generate(){
+    if(!form.destination||!form.departure) return;
+    setLoading(true);
+    setTimeout(function(){
+      try{var r=generateItinerary(form);setIt(r);setTab('days');}catch(e){console.error(e);}
+      setLoading(false);
+    },480);
+  }
+  function updateDay(idx,d){setIt(function(p){var days=p.days.slice();days[idx]=d;return Object.assign({},p,{days:days});});}
+  function deleteDay(idx){setIt(function(p){return Object.assign({},p,{days:p.days.filter(function(_,i){return i!==idx;}).map(function(d,i){return Object.assign({},d,{day:i+1});})});});}
+  function addDayAfter(idx){setIt(function(p){
+    var ref=p.days[idx];
+    var nd={id:'new-'+Date.now(),day:idx+2,date:'请填写日期',city:ref.city,theme:'自由探索日',morning:'自由安排',afternoon:'自由安排',evening:'自由安排',transport:ref.transport,hotel:ref.hotel,note:'手动新增，请补充内容'};
+    var days=p.days.slice(0,idx+1).concat([nd]).concat(p.days.slice(idx+1)).map(function(d,i){return Object.assign({},d,{day:i+1});});
+    return Object.assign({},p,{days:days});
+  });}
+  function moveDay(idx,dir){setIt(function(p){
+    var days=p.days.slice();var ni=idx+dir;
+    if(ni<0||ni>=days.length) return p;
+    var tmp=days[idx];days[idx]=days[ni];days[ni]=tmp;
+    return Object.assign({},p,{days:days.map(function(d,i){return Object.assign({},d,{day:i+1});})});
+  });}
+  function exportTxt(){
+    if(!it) return;
+    var blob=new Blob([buildFullText(it)],{type:'text/plain;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='行程_'+it.overview.title+'.txt';a.click();
+  }
+  function exportWord(){
+    if(!it) return;
+    if(!window.docx){alert('Word导出库加载中，请稍候再试。');return;}
+    exportDocx(it, form);
+  }
+
+  return h('div',{style:{display:'flex',flexDirection:'column',height:'100vh',background:C.bg}},
+
+    // ── TOP HEADER ──
+    h('div',{style:{background:C.header,borderBottom:'1px solid '+C.border,padding:'10px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,boxShadow:'0 1px 3px rgba(0,0,0,.06)'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:'10px'}},
+        h('div',{style:{width:'30px',height:'30px',borderRadius:'8px',background:C.accentBg,border:'1px solid '+C.accentBorder,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}},'✈️'),
+        h('div',null,
+          h('div',{style:{fontSize:'14px',fontWeight:'700',color:C.text,letterSpacing:'.01em'}},'旅行定制师 · 行程工作台'),
+          h('div',{style:{fontSize:'10px',color:C.textSub,fontFamily:FM}},'Travel Planner Pro · v2.0')
+        )
+      ),
+      it?h('div',{style:{display:'flex',gap:'8px',alignItems:'center'}},
+        h(CopyBtn,{getText:function(){return it.clientMsg;},style:{background:'#f0fdf4',borderColor:'#86efac',color:'#15803d'}},'💬 复制对客版'),
+        h(CopyBtn,{getText:function(){return buildFullText(it);},style:{background:'#eff6ff',borderColor:'#93c5fd',color:'#1d4ed8'}},'📄 复制完整版'),
+        h('button',{onClick:exportWord,style:{display:'inline-flex',alignItems:'center',gap:'5px',padding:'6px 11px',borderRadius:'5px',fontSize:'12px',cursor:'pointer',border:'1px solid #93c5fd',background:'#eff6ff',color:'#1d4ed8',fontFamily:F,fontWeight:'500'}},'📝 导出 Word'),
+        h('button',{onClick:exportTxt,style:{display:'inline-flex',alignItems:'center',gap:'5px',padding:'6px 11px',borderRadius:'5px',fontSize:'12px',cursor:'pointer',border:'1px solid '+C.border,background:C.surfaceAlt,color:C.textMid,fontFamily:F}},'⬇ 导出 .txt')
+      ):null
+    ),
+
+    // ── BODY ──
+    h('div',{style:{display:'flex',flex:1,overflow:'hidden'}},
+
+      // Left sidebar
+      h('div',{style:{width:'288px',flexShrink:0,borderRight:'1px solid '+C.border,overflowY:'auto',background:C.sidebar}},
+        h(LeftForm,{form:form,setForm:setForm,onGenerate:generate,loading:loading})
+      ),
+
+      // Right content
+      h('div',{style:{flex:1,overflow:'hidden',display:'flex',flexDirection:'column'}},
+        !it?
+          // Empty state
+          h('div',{style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'14px'}},
+            h('div',{style:{fontSize:'48px',opacity:.15}},'🗺'),
+            h('div',{style:{textAlign:'center'}},
+              h('div',{style:{color:C.textMid,fontSize:'14px',marginBottom:'6px',fontWeight:'500'}},'填写左侧客户信息，点击「生成行程」'),
+              h('div',{style:{fontSize:'12px',color:C.textSub,fontFamily:FM}},'日本 · 韩国 · 泰国 · 法国 · 意大利 · 新加坡 · 马来西亚')
+            )
+          ):
+
+          h('div',{style:{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}},
+            // Tab bar
+            h('div',{style:{background:C.surface,borderBottom:'1px solid '+C.border,padding:'0 16px',display:'flex',alignItems:'center',flexShrink:0}},
+              TABS.map(function(t){
+                var active=tab===t.id;
+                return h('button',{key:t.id,onClick:function(){setTab(t.id);},style:{
+                  padding:'11px 13px',fontSize:'12px',fontWeight:active?'600':'400',background:'transparent',border:'none',
+                  cursor:'pointer',outline:'none',borderBottom:'2px solid '+(active?C.accent:'transparent'),
+                  color:active?C.accentText:C.textMid,fontFamily:F,transition:'all .15s',
+                }},t.label);
+              }),
+              h('div',{style:{flex:1}}),
+              h('button',{onClick:generate,style:{
+                display:'inline-flex',alignItems:'center',gap:'5px',padding:'5px 11px',borderRadius:'5px',
+                fontSize:'12px',cursor:'pointer',border:'1px solid '+C.border,background:C.surfaceAlt,
+                color:C.textMid,fontFamily:F,margin:'6px 0',
+              }},'↺ 重新生成')
+            ),
+
+            // Content area
+            h('div',{style:{flex:1,overflowY:'auto',padding:'14px 16px',background:C.bg}},
+              tab==='days'?h('div',null,
+                h(OverviewBar,{ov:it.overview,setOv:function(ov){setIt(function(p){return Object.assign({},p,{overview:ov});});}}),
+                h(RushBar,{days:it.days,style:form.style}),
+                h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'8px'}},
+                  h('span',{style:{fontSize:'11px',color:C.textSub,fontFamily:FM}},'共 '+it.days.length+' 天 · 所有字段可直接编辑 · ↑↓ 调整顺序'),
+                  h('button',{onClick:function(){addDayAfter(it.days.length-1);},style:{
+                    display:'flex',alignItems:'center',gap:'4px',background:'none',border:'none',
+                    cursor:'pointer',color:C.accent,fontSize:'12px',fontFamily:F,padding:'3px 6px',borderRadius:'4px',fontWeight:'500',
+                  }},'+ 末尾新增一天')
+                ),
+                it.days.map(function(day,idx){
+                  return h(DayCard,{key:day.id,day:day,idx:idx,total:it.days.length,style:form.style,
+                    onUpdate:updateDay,onDelete:deleteDay,
+                    onMoveUp:function(i){moveDay(i,-1);},
+                    onMoveDown:function(i){moveDay(i,1);},
+                    onAddAfter:addDayAfter,
+                  });
+                })
+              ):
+              tab==='client'?h(ClientPanel,{msg:it.clientMsg,setMsg:function(m){setIt(function(p){return Object.assign({},p,{clientMsg:m});});}}) :
+              tab==='audit'?h(AuditPanel,{it:it,form:form}):
+              h(NotesPanel,{notes:it.designNotes})
+            )
+          )
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>
