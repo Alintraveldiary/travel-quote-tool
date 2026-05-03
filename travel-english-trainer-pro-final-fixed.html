@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>旅行定制师英语训练营 Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #f5f0e8;
+    --gold: #c9a84c;
+    --gold-light: #e8d5a3;
+    --rust: #b5451b;
+    --teal: #1a6b6b;
+    --teal-light: #e0f0f0;
+    --muted: #8a8070;
+    --white: #fff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 10% 20%, rgba(201,168,76,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, rgba(26,107,107,0.08) 0%, transparent 50%);
+  }
+
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 20px 24px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--gold);
+  }
+
+  .header-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.02em;
+    color: var(--gold);
+  }
+
+  header span {
+    font-size: 0.75rem;
+    color: #888;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    margin-top: 10px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 16px 100px;
+  }
+
+  /* TAB NAV */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin: 20px 0 24px;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 2px 12px rgba(26,26,46,0.08);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    flex: 0 0 auto;
+    min-width: 74px;
+    padding: 10px 8px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .tab-btn.active {
+    background: var(--ink);
+    color: var(--gold);
+  }
+
+  /* CATEGORY PILLS */
+  .cat-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 20px;
+    scrollbar-width: none;
+  }
+
+  .cat-scroll::-webkit-scrollbar { display: none; }
+
+  .cat-pill {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1.5px solid var(--gold-light);
+    background: var(--white);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .cat-pill.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink);
+  }
+
+  /* FLASHCARD */
+  .card-wrap {
+    perspective: 1000px;
+    margin-bottom: 20px;
+  }
+
+  .flashcard {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 36px 28px 28px;
+    box-shadow: 0 4px 24px rgba(26,26,46,0.1), 0 1px 4px rgba(26,26,46,0.06);
+    position: relative;
+    border-top: 4px solid var(--gold);
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .flashcard:active {
+    transform: scale(0.99);
+    box-shadow: 0 2px 12px rgba(26,26,46,0.08);
+  }
+
+  .card-tag {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .card-en {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .card-phonetic {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+    letter-spacing: 0.02em;
+  }
+
+  .card-reveal {
+    background: var(--teal-light);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 0.9rem;
+    color: var(--teal);
+    font-weight: 500;
+    display: none;
+    animation: fadeUp 0.3s ease;
+  }
+
+  .card-reveal.shown { display: block; }
+
+  .card-example {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 8px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-reveal {
+    background: var(--ink);
+    color: var(--gold);
+  }
+
+  .btn-know {
+    background: var(--teal);
+    color: var(--white);
+  }
+
+  .btn-again {
+    background: var(--rust);
+    color: var(--white);
+  }
+
+  .btn-next {
+    background: var(--gold);
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .btn:active { opacity: 0.85; transform: scale(0.98); }
+
+  /* COUNTER */
+  .card-counter {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  /* SCORE BADGES */
+  .score-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .score-badge {
+    flex: 1;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+  }
+
+  .score-badge .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  .score-badge .label {
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .score-badge.green .num { color: var(--teal); }
+  .score-badge.red .num { color: var(--rust); }
+  .score-badge.gold .num { color: var(--gold); }
+
+  /* SENTENCE SECTION */
+  .sentence-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 12px rgba(26,26,46,0.07);
+    border-left: 4px solid var(--teal);
+    animation: fadeUp 0.3s ease;
+  }
+
+  .sentence-type {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--teal);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .sentence-en {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .sentence-zh {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+    display: none;
+  }
+
+  .sentence-zh.shown { display: block; animation: fadeUp 0.25s ease; }
+
+  .sentence-toggle {
+    font-size: 0.75rem;
+    color: var(--gold);
+    cursor: pointer;
+    margin-top: 8px;
+    font-weight: 500;
+    display: inline-block;
+  }
+
+  /* PHONE SECTION */
+  .phone-card {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 16px rgba(26,26,46,0.15);
+    animation: fadeUp 0.3s ease;
+  }
+
+  .phone-scenario {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .phone-speaker {
+    font-size: 0.7rem;
+    color: #888;
+    margin-bottom: 4px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  .phone-line {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin-bottom: 12px;
+    color: var(--paper);
+  }
+
+  .phone-line.you {
+    color: var(--gold-light);
+    padding-left: 12px;
+    border-left: 2px solid var(--gold);
+  }
+
+  .phone-tip {
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.78rem;
+    color: #aaa;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  .phone-tip::before {
+    content: "💡 ";
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gold-light);
+  }
+
+  /* QUIZ MODE */
+  .quiz-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 4px 24px rgba(26,26,46,0.1);
+    margin-bottom: 20px;
+    border-top: 4px solid var(--rust);
+  }
+
+  .quiz-q {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .quiz-prompt {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .quiz-opt {
+    padding: 13px 16px;
+    border: 1.5px solid var(--gold-light);
+    border-radius: 10px;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--ink);
+  }
+
+  .quiz-opt:hover { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+  .quiz-opt.correct { background: var(--teal-light); border-color: var(--teal); color: var(--teal); font-weight: 600; }
+  .quiz-opt.wrong { background: #fde8e0; border-color: var(--rust); color: var(--rust); }
+
+  .quiz-feedback {
+    margin-top: 14px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: none;
+    animation: fadeUp 0.3s ease;
+  }
+
+  .quiz-feedback.shown { display: block; }
+
+
+
+  /* LIVE SCENARIO SECTION */
+  .live-card {
+    background: var(--white);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 3px 16px rgba(26,26,46,0.08);
+    border-left: 4px solid var(--gold);
+    animation: fadeUp 0.3s ease;
+  }
+
+  .live-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.08rem;
+    color: var(--ink);
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  .live-meta {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 0.72rem;
+    color: var(--teal);
+    background: var(--teal-light);
+    padding: 5px 9px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  .live-subtitle {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    font-weight: 700;
+    margin: 14px 0 8px;
+  }
+
+  .live-key {
+    border-bottom: 1px solid rgba(201,168,76,0.18);
+    padding: 10px 0;
+  }
+
+  .live-key:last-child { border-bottom: none; }
+
+  .live-en {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    line-height: 1.45;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+
+  .live-zh {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  .live-dialog {
+    background: rgba(26,26,46,0.04);
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 8px;
+  }
+
+  .live-dialog-line {
+    margin-bottom: 10px;
+  }
+
+  .live-speaker {
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    margin-bottom: 3px;
+  }
+
+  .live-dialog-text {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .live-dialog-text.you {
+    color: var(--teal);
+    font-weight: 600;
+  }
+
+  /* hidden section */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  /* TTS SPEAK BUTTON */
+  .speak-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1.5px solid var(--gold-light);
+    background: transparent;
+    font-size: 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    vertical-align: middle;
+  }
+
+  .speak-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.06); }
+  .speak-btn.speaking { border-color: var(--teal); color: var(--teal); background: var(--teal-light); animation: pulse 1s infinite; }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .speak-btn svg { width: 13px; height: 13px; fill: currentColor; }
+
+  /* Card speak row */
+  .card-speak-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  /* Speed selector */
+  .speed-select {
+    font-size: 0.72rem;
+    color: var(--muted);
+    border: 1px solid var(--gold-light);
+    border-radius: 6px;
+    padding: 3px 6px;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+  }
+
+  /* Voice notice */
+  .voice-notice {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+
+  /* Phone line speak */
+  .phone-line-wrap {
+    margin-bottom: 10px;
+  }
+
+  .phone-line-wrap .phone-line {
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>Travel English</h1>
+    <span>旅行定制师专用</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('vocab')">📇 单词</button>
+    <button class="tab-btn" onclick="switchTab('sentences')">✉️ 句子</button>
+    <button class="tab-btn" onclick="switchTab('phone')">📞 电话</button>
+    <button class="tab-btn" onclick="switchTab('live')">🔥 实战</button>
+    <button class="tab-btn" onclick="switchTab('pro')">🧠 工作台</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">🎯 测试</button>
+  </div>
+
+  <!-- ===== VOCAB TAB ===== -->
+  <div class="tab-content active" id="tab-vocab">
+    <div class="voice-notice" id="voiceNotice">正在加载语音引擎…</div>
+    <div class="score-row">
+      <div class="score-badge green"><div class="num" id="knowCount">0</div><div class="label">已掌握</div></div>
+      <div class="score-badge red"><div class="num" id="againCount">0</div><div class="label">再练</div></div>
+      <div class="score-badge gold"><div class="num" id="totalCount">0</div><div class="label">共</div></div>
+    </div>
+
+    <div class="cat-scroll" id="catPills"></div>
+
+    <div class="card-counter" id="cardCounter"></div>
+
+    <div class="card-wrap">
+      <div class="flashcard" id="flashcard">
+        <div>
+          <div class="card-tag" id="cardTag"></div>
+          <div class="card-en" id="cardEn"></div>
+          <div class="card-phonetic" id="cardPhonetic"></div>
+          <div class="card-reveal" id="cardReveal">
+            <div id="cardZh"></div>
+            <div class="card-example" id="cardExample"></div>
+          </div>
+        </div>
+        <div class="card-actions" id="cardActions">
+          <button class="btn btn-reveal" onclick="revealCard()">点击查看释义</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SENTENCES TAB ===== -->
+  <div class="tab-content" id="tab-sentences">
+    <div class="cat-scroll" id="sentCatPills"></div>
+    <div id="sentenceList"></div>
+  </div>
+
+  <!-- ===== PHONE TAB ===== -->
+  <div class="tab-content" id="tab-phone">
+    <div class="cat-scroll" id="phoneCatPills"></div>
+    <div id="phoneList"></div>
+  </div>
+
+
+  <!-- ===== LIVE TAB ===== -->
+  <div class="tab-content" id="tab-live">
+    <div class="voice-notice">真实旅游场景｜客户现场可直接照着说</div>
+    <div class="cat-scroll" id="liveCatPills"></div>
+    <div id="liveList"></div>
+  </div>
+
+  <!-- ===== PRO TAB ===== -->
+  <div class="tab-content" id="tab-pro">
+    <div class="voice-notice">定制师工作台｜邮件、电话、供应商沟通、突发处理，可复制可朗读</div>
+    <div class="cat-scroll" id="proCatPills"></div>
+    <div id="proList"></div>
+  </div>
+
+  <!-- ===== QUIZ TAB ===== -->
+  <div class="tab-content" id="tab-quiz">
+    <div class="score-row">
+      <div class="score-badge green"><div class="num" id="qCorrect">0</div><div class="label">答对</div></div>
+      <div class="score-badge red"><div class="num" id="qWrong">0</div><div class="label">答错</div></div>
+    </div>
+    <div id="quizArea"></div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const vocab = [
+  // --- FLIGHT ---
+  { en: "one-way ticket", phonetic: "/wʌn weɪ ˈtɪkɪt/", zh: "单程票", example: "I'd like to book a one-way ticket to Tokyo.", cat: "机票" },
+  { en: "round-trip ticket", phonetic: "/raʊnd trɪp ˈtɪkɪt/", zh: "往返票", example: "Do you have round-trip tickets available for this weekend?", cat: "机票" },
+  { en: "business class", phonetic: "/ˈbɪznɪs klɑːs/", zh: "商务舱", example: "I'd like to upgrade to business class if possible.", cat: "机票" },
+  { en: "economy class", phonetic: "/ɪˈkɒnəmi klɑːs/", zh: "经济舱", example: "Two seats in economy class, please.", cat: "机票" },
+  { en: "layover / stopover", phonetic: "/ˈleɪəʊvər/", zh: "中转/经停", example: "We have a 4-hour layover in Singapore.", cat: "机票" },
+  { en: "connecting flight", phonetic: "/kəˈnektɪŋ flaɪt/", zh: "转机航班", example: "What's the connecting flight number?", cat: "机票" },
+  { en: "checked baggage", phonetic: "/tʃekt ˈbæɡɪdʒ/", zh: "托运行李", example: "The checked baggage allowance is 23kg.", cat: "机票" },
+  { en: "carry-on luggage", phonetic: "/ˈkæri ɒn ˈlʌɡɪdʒ/", zh: "随身行李", example: "Only one carry-on luggage is allowed.", cat: "机票" },
+  { en: "seat preference", phonetic: "/siːt ˈprefrəns/", zh: "座位偏好", example: "Do you have any seat preference — window or aisle?", cat: "机票" },
+  { en: "aisle seat", phonetic: "/aɪl siːt/", zh: "靠通道座位", example: "My client prefers an aisle seat.", cat: "机票" },
+  { en: "itinerary confirmation", phonetic: "/aɪˈtɪnərəri ˌkɒnfəˈmeɪʃən/", zh: "行程确认单", example: "I'll send you the itinerary confirmation shortly.", cat: "机票" },
+  { en: "flight cancellation", phonetic: "/flaɪt ˌkænsəˈleɪʃən/", zh: "航班取消", example: "We need to rebook due to a flight cancellation.", cat: "机票" },
+
+  // --- HOTEL ---
+  { en: "deluxe room", phonetic: "/dɪˈlʌks ruːm/", zh: "豪华客房", example: "I'd like to reserve a deluxe room with a sea view.", cat: "酒店" },
+  { en: "suite", phonetic: "/swiːt/", zh: "套房", example: "The presidential suite is available for three nights.", cat: "酒店" },
+  { en: "check-in / check-out", phonetic: "/tʃek ɪn / tʃek aʊt/", zh: "入住/退房", example: "Check-in is on the 5th and check-out on the 10th.", cat: "酒店" },
+  { en: "early check-in", phonetic: "/ˈɜːli tʃek ɪn/", zh: "提前入住", example: "Could you arrange an early check-in for my guests?", cat: "酒店" },
+  { en: "late check-out", phonetic: "/leɪt tʃek aʊt/", zh: "延迟退房", example: "My clients need a late check-out until 2 PM.", cat: "酒店" },
+  { en: "complimentary breakfast", phonetic: "/ˌkɒmplɪˈmentəri ˈbrekfəst/", zh: "免费早餐", example: "Does the rate include complimentary breakfast?", cat: "酒店" },
+  { en: "ocean / city view", phonetic: "/ˈəʊʃən / ˈsɪti vjuː/", zh: "海景/城景", example: "They'd prefer an ocean view room.", cat: "酒店" },
+  { en: "cancellation policy", phonetic: "/ˌkænsəˈleɪʃən ˈpɒlɪsi/", zh: "取消政策", example: "What's your cancellation policy for this booking?", cat: "酒店" },
+  { en: "non-refundable", phonetic: "/nɒn rɪˈfʌndəbl/", zh: "不可退款", example: "Please note this rate is non-refundable.", cat: "酒店" },
+  { en: "room upgrade", phonetic: "/ruːm ˈʌpɡreɪd/", zh: "房型升级", example: "Is a complimentary room upgrade possible?", cat: "酒店" },
+  { en: "amenities", phonetic: "/əˈmiːnɪtiz/", zh: "设施/配套", example: "What amenities does the property offer?", cat: "酒店" },
+  { en: "concierge", phonetic: "/ˈkɒnsɪeəʒ/", zh: "礼宾服务", example: "Please contact the concierge for dinner reservations.", cat: "酒店" },
+
+  // --- TICKETS / ATTRACTIONS ---
+  { en: "admission ticket", phonetic: "/ədˈmɪʃən ˈtɪkɪt/", zh: "入场票", example: "I need admission tickets for 4 adults and 2 children.", cat: "门票" },
+  { en: "skip-the-line ticket", phonetic: "/skɪp ðə laɪn ˈtɪkɪt/", zh: "免排队票", example: "Do you offer skip-the-line tickets for the Louvre?", cat: "门票" },
+  { en: "guided tour", phonetic: "/ˈɡaɪdɪd tʊər/", zh: "导览游", example: "I'd like to book a private guided tour.", cat: "门票" },
+  { en: "capacity / availability", phonetic: "/kəˈpæsɪti / əˌveɪləˈbɪlɪti/", zh: "容量/名额", example: "Could you check availability for June 12th?", cat: "门票" },
+  { en: "time slot", phonetic: "/taɪm slɒt/", zh: "时段/档期", example: "The 10 AM time slot is fully booked.", cat: "门票" },
+  { en: "group booking", phonetic: "/ɡruːp ˈbʊkɪŋ/", zh: "团体预订", example: "We'd like to make a group booking for 15 people.", cat: "门票" },
+  { en: "private transfer", phonetic: "/ˈpraɪvɪt ˈtrænsɜːr/", zh: "专车接送", example: "We need a private transfer from the airport.", cat: "门票" },
+  { en: "day pass", phonetic: "/deɪ pɑːs/", zh: "一日通票", example: "Does a day pass cover all the attractions?", cat: "门票" },
+
+  // --- GENERAL ---
+  { en: "itinerary", phonetic: "/aɪˈtɪnərəri/", zh: "行程单/路线", example: "I'll customize the itinerary based on your preferences.", cat: "通用" },
+  { en: "tailored / customized", phonetic: "/ˈteɪlərd / ˈkʌstəmaɪzd/", zh: "定制/专属", example: "This is a fully tailored travel experience.", cat: "通用" },
+  { en: "peak season / off-season", phonetic: "/piːk ˈsiːzən/", zh: "旺季/淡季", example: "Prices are higher during peak season.", cat: "通用" },
+  { en: "travel insurance", phonetic: "/ˈtrævəl ɪnˈʃʊərəns/", zh: "旅行险", example: "I strongly recommend purchasing travel insurance.", cat: "通用" },
+  { en: "visa requirement", phonetic: "/ˈviːzə rɪˈkwaɪərmənt/", zh: "签证要求", example: "Let me check the visa requirements for your passport.", cat: "通用" },
+  { en: "surcharge / supplement", phonetic: "/ˈsɜːrtʃɑːrdʒ/", zh: "附加费/补差价", example: "There's a peak season surcharge of 20%.", cat: "通用" },
+  { en: "deposit", phonetic: "/dɪˈpɒzɪt/", zh: "订金/押金", example: "A 30% deposit is required to confirm the booking.", cat: "通用" },
+  { en: "balance payment", phonetic: "/ˈbæləns ˈpeɪmənt/", zh: "尾款", example: "The balance payment is due 30 days before departure.", cat: "通用" },
+];
+
+const sentences = [
+  // EMAIL
+  { type: "邮件 · 开头", en: "Dear [Name], I hope this message finds you well.", zh: "尊敬的[姓名]，希望您一切安好。", cat: "邮件" },
+  { type: "邮件 · 预订请求", en: "I am writing to inquire about room availability from [date] to [date] for [number] guests.", zh: "我来函是想了解[日期]至[日期]期间、[人数]名客人的客房情况。", cat: "邮件" },
+  { type: "邮件 · 确认预订", en: "Could you please confirm the reservation details and send me a written confirmation?", zh: "请您确认预订详情并发送书面确认单给我。", cat: "邮件" },
+  { type: "邮件 · 特殊要求", en: "My clients have a special request: they would prefer a high-floor room with a city view.", zh: "我的客户有特殊需求：他们希望住在高楼层的城景房。", cat: "邮件" },
+  { type: "邮件 · 取消", en: "I regret to inform you that we need to cancel the booking due to unforeseen circumstances.", zh: "很遗憾通知您，由于不可预见的情况，我们需要取消此次预订。", cat: "邮件" },
+  { type: "邮件 · 报价跟进", en: "I'm following up on my previous inquiry regarding the pricing for a private group tour.", zh: "我是就私人团体游价格的前期询价进行跟进。", cat: "邮件" },
+  { type: "邮件 · 感谢", en: "Thank you for your prompt response. I look forward to working with you.", zh: "感谢您的及时回复，期待与您合作。", cat: "邮件" },
+  { type: "邮件 · 结尾", en: "Please do not hesitate to contact me should you need any further information.", zh: "如需更多信息，请随时联系我。", cat: "邮件" },
+
+  // PHONE
+  { type: "电话 · 开场", en: "Good morning, this is [Your Name] calling from [Company]. Am I speaking with the reservations team?", zh: "早上好，我是[公司]的[姓名]。请问是预订部吗？", cat: "电话" },
+  { type: "电话 · 预订", en: "I'd like to make a reservation for [number] guests, arriving on [date] and checking out on [date].", zh: "我想为[人数]位客人预订，[日期]入住，[日期]退房。", cat: "电话" },
+  { type: "电话 · 确认", en: "Could you repeat the confirmation number for me, please?", zh: "请您重复一下确认号码好吗？", cat: "电话" },
+  { type: "电话 · 听不清", en: "I'm sorry, could you speak a little more slowly? I want to make sure I have the correct details.", zh: "不好意思，您能说慢一点吗？我想确保信息准确。", cat: "电话" },
+  { type: "电话 · 拼写", en: "Let me spell that for you: B for Bravo, R for Romeo, O for Oscar…", zh: "我来拼一下：B是Bravo，R是Romeo，O是Oscar……", cat: "电话" },
+  { type: "电话 · 结束", en: "Thank you so much for your help. I'll be in touch if I have any further questions.", zh: "非常感谢您的帮助。如有其他问题我会再联系您。", cat: "电话" },
+
+  // NEGOTIATION
+  { type: "谈价 · 询价", en: "What is your best rate for a 5-night stay in a deluxe double room?", zh: "豪华双人房住5晚的最优惠价格是多少？", cat: "谈判" },
+  { type: "谈价 · 砍价", en: "Given the volume of bookings we bring, would it be possible to offer a preferential rate?", zh: "考虑到我们的业务量，是否可以提供优惠价格？", cat: "谈判" },
+  { type: "谈价 · 增值", en: "Could you include complimentary breakfast or a room upgrade as part of the deal?", zh: "能否在协议中加入免费早餐或房型升级？", cat: "谈判" },
+];
+
+const phoneDialogs = [
+  {
+    cat: "机票预订",
+    scenario: "📞 预订机票 — 致电航空公司",
+    lines: [
+      { speaker: "Airline", text: "Thank you for calling China Airlines. How may I assist you today?" },
+      { speaker: "YOU", text: "Good morning. I'd like to book two business class seats from Shanghai to Paris on June 15th, please." },
+      { speaker: "Airline", text: "Of course. Are you looking for a one-way or round-trip?" },
+      { speaker: "YOU", text: "Round-trip. Return on June 25th. Do you have any direct flights available?" },
+      { speaker: "Airline", text: "We have a direct flight departing at 10:45 AM. Total fare for two business class seats would be around 28,000 RMB per person." },
+      { speaker: "YOU", text: "That works. Could you also confirm the checked baggage allowance for business class?" },
+    ],
+    tip: "预订时务必确认：座位偏好(aisle/window)、行李限额、餐食要求(meal preference)，以及是否有里程积分(frequent flyer miles)。"
+  },
+  {
+    cat: "酒店预订",
+    scenario: "📞 酒店预订 — 要求特殊待遇",
+    lines: [
+      { speaker: "Hotel", text: "Good afternoon, Aman Tokyo reservations, how can I help you?" },
+      { speaker: "YOU", text: "Hi, I'm a travel consultant. I'd like to reserve a deluxe suite for 3 nights, from September 10th to 13th." },
+      { speaker: "Hotel", text: "Certainly. How many guests will be staying?" },
+      { speaker: "YOU", text: "Two guests. They're celebrating their anniversary, so I'd like to request a high-floor room with a city view if possible." },
+      { speaker: "Hotel", text: "I'll note that as a special request. We'll do our best to accommodate." },
+      { speaker: "YOU", text: "Wonderful. Could you also arrange a complimentary fruit basket or small welcome amenity? They're VIP clients." },
+    ],
+    tip: "为VIP客人预订时，说明身份 'I'm a travel consultant/agent' 会更容易争取到升级和特殊礼遇。记得索取 confirmation number。"
+  },
+  {
+    cat: "门票/活动",
+    scenario: "📞 景点门票 — 询问团体票",
+    lines: [
+      { speaker: "Venue", text: "Hello, Colosseum ticket office, how can I assist you?" },
+      { speaker: "YOU", text: "Hello, I'm calling on behalf of a private group of 12. I'd like to inquire about group booking options for the Colosseum." },
+      { speaker: "Venue", text: "For groups of 10 or more, we offer a 15% discount on standard tickets. Would you like skip-the-line access as well?" },
+      { speaker: "YOU", text: "Yes, please. Can we also request a private guide for the tour?" },
+      { speaker: "Venue", text: "Absolutely. A private guided tour is 280 euros for up to 15 people." },
+      { speaker: "YOU", text: "That sounds good. Which time slots are available on July 3rd?" },
+    ],
+    tip: "询问团体票时，提前说明人数 'a group of X'，然后问折扣(discount/preferential rate)、时段(time slot)、私导(private guide)，最后确认付款方式。"
+  },
+  {
+    cat: "处理问题",
+    scenario: "📞 紧急处理 — 航班取消",
+    lines: [
+      { speaker: "Airline", text: "Thank you for holding. How may I help you?" },
+      { speaker: "YOU", text: "Hi, I'm calling about a booking for two passengers — flight CA832 on July 10th. It's been cancelled and I need to rebook as soon as possible." },
+      { speaker: "Airline", text: "I understand. Could you provide the booking reference number?" },
+      { speaker: "YOU", text: "Of course, it's X-Y-Z 4-5-6. My clients need to arrive in Tokyo no later than July 11th morning." },
+      { speaker: "Airline", text: "I see there's an alternative flight departing at 11 PM tonight — would that work?" },
+      { speaker: "YOU", text: "That could work. Will my clients be entitled to meal vouchers given the disruption?" },
+    ],
+    tip: "处理紧急情况时保持语速平稳，明确说出 deadline ('no later than')。可以争取 meal voucher、hotel accommodation，甚至 compensation 作为补偿。"
+  },
+];
+
+
+// ============================================================
+// EXTENDED REAL TRAVEL SCENES ADDED BY GPT
+// 适合：客人在目的地真实会遇到的场景 + 定制师提前辅导客人
+// ============================================================
+vocab.push(
+  { en: "passport", phonetic: "/ˈpɑːspɔːrt/", zh: "护照", example: "May I see your passport, please?", cat: "实景高频" },
+  { en: "reservation name", phonetic: "/ˌrezərˈveɪʃən neɪm/", zh: "预订姓名", example: "The reservation is under the name Li.", cat: "实景高频" },
+  { en: "security deposit", phonetic: "/sɪˈkjʊərəti dɪˈpɒzɪt/", zh: "押金/保证金", example: "A security deposit is required at check-in.", cat: "实景高频" },
+  { en: "room key", phonetic: "/ruːm kiː/", zh: "房卡/房间钥匙", example: "Could I have two room keys, please?", cat: "实景高频" },
+  { en: "extra bed", phonetic: "/ˈekstrə bed/", zh: "加床", example: "Could we add an extra bed to the room?", cat: "实景高频" },
+  { en: "housekeeping", phonetic: "/ˈhaʊskiːpɪŋ/", zh: "客房清洁", example: "Could you send housekeeping to my room?", cat: "实景高频" },
+  { en: "menu", phonetic: "/ˈmenjuː/", zh: "菜单", example: "Could we have the menu, please?", cat: "餐厅" },
+  { en: "recommendation", phonetic: "/ˌrekəmenˈdeɪʃən/", zh: "推荐", example: "Do you have any local recommendations?", cat: "餐厅" },
+  { en: "allergy", phonetic: "/ˈælərdʒi/", zh: "过敏", example: "I have a seafood allergy.", cat: "餐厅" },
+  { en: "bill / check", phonetic: "/bɪl / tʃek/", zh: "账单", example: "Could we have the bill, please?", cat: "餐厅" },
+  { en: "platform", phonetic: "/ˈplætfɔːrm/", zh: "站台", example: "Which platform does the train leave from?", cat: "交通" },
+  { en: "one-way fare", phonetic: "/wʌn weɪ feər/", zh: "单程票价", example: "How much is the one-way fare?", cat: "交通" },
+  { en: "taxi stand", phonetic: "/ˈtæksi stænd/", zh: "出租车等候区", example: "Where is the taxi stand?", cat: "交通" },
+  { en: "lost and found", phonetic: "/lɒst ənd faʊnd/", zh: "失物招领处", example: "Is there a lost and found office here?", cat: "求助" },
+  { en: "receipt", phonetic: "/rɪˈsiːt/", zh: "收据/小票", example: "Could I have a receipt, please?", cat: "购物" },
+  { en: "tax refund", phonetic: "/tæks ˈriːfʌnd/", zh: "退税", example: "Can I get a tax refund form?", cat: "购物" },
+  { en: "pharmacy", phonetic: "/ˈfɑːrməsi/", zh: "药房", example: "Is there a pharmacy nearby?", cat: "求助" },
+  { en: "emergency", phonetic: "/ɪˈmɜːrdʒənsi/", zh: "紧急情况", example: "This is an emergency. We need help.", cat: "求助" }
+);
+
+sentences.push(
+  { type: "酒店 · 入住", en: "Hello, I have a reservation under the name [Name].", zh: "您好，我有一个预订，预订姓名是[姓名]。", cat: "实景" },
+  { type: "酒店 · 护照", en: "Here are our passports. Do you need a credit card for the deposit?", zh: "这是我们的护照。押金需要信用卡吗？", cat: "实景" },
+  { type: "酒店 · 提前入住", en: "We arrived early. Is it possible to check in now?", zh: "我们到早了，现在可以办理入住吗？", cat: "实景" },
+  { type: "酒店 · 房间问题", en: "The air conditioner is not working. Could someone come and check it?", zh: "空调无法使用，可以请人来检查一下吗？", cat: "实景" },
+  { type: "酒店 · 寄存行李", en: "Could we leave our luggage here until check-in time?", zh: "我们可以把行李寄存在这里直到入住时间吗？", cat: "实景" },
+  { type: "餐厅 · 入座", en: "Hello, we have a reservation for two under the name [Name].", zh: "您好，我们有两位的预订，姓名是[姓名]。", cat: "实景" },
+  { type: "餐厅 · 点餐", en: "What would you recommend for a first-time visitor?", zh: "第一次来这里，您有什么推荐吗？", cat: "实景" },
+  { type: "餐厅 · 过敏", en: "I have a seafood allergy. Could you please make sure there is no seafood in this dish?", zh: "我海鲜过敏。请确认这道菜里没有海鲜可以吗？", cat: "实景" },
+  { type: "餐厅 · 结账", en: "Could we have the bill, please? Can we pay by credit card?", zh: "请给我们账单。可以刷信用卡吗？", cat: "实景" },
+  { type: "问路 · 基础", en: "Excuse me, could you tell me how to get to the nearest metro station?", zh: "不好意思，请问最近的地铁站怎么走？", cat: "实景" },
+  { type: "问路 · 确认方向", en: "Is it within walking distance, or should we take a taxi?", zh: "这里走路能到吗，还是我们应该打车？", cat: "实景" },
+  { type: "交通 · 买票", en: "Two tickets to [Station], please. Which platform should we go to?", zh: "请给我们两张到[车站]的票。我们应该去哪个站台？", cat: "实景" },
+  { type: "打车 · 地址", en: "Could you take us to this address, please? Here is the location on Google Maps.", zh: "请带我们去这个地址。这是谷歌地图上的位置。", cat: "实景" },
+  { type: "求助 · 迷路", en: "I think we are lost. Could you help us find this place?", zh: "我们好像迷路了。您能帮我们找这个地方吗？", cat: "实景" },
+  { type: "求助 · 遗失物品", en: "I lost my bag. Could you tell me where the lost and found office is?", zh: "我的包丢了。请问失物招领处在哪里？", cat: "实景" },
+  { type: "求助 · 身体不适", en: "I don't feel well. Is there a pharmacy or clinic nearby?", zh: "我不太舒服。附近有药房或诊所吗？", cat: "实景" },
+  { type: "购物 · 退税", en: "Can I get a tax refund form? I have my passport with me.", zh: "可以给我退税单吗？我带了护照。", cat: "实景" },
+  { type: "景点 · 入场", en: "We booked tickets online. Do we need to show the QR code here?", zh: "我们在网上订了票。需要在这里出示二维码吗？", cat: "实景" },
+  { type: "海关 · 目的", en: "I'm here for tourism. I will stay for [number] days and then return to China.", zh: "我是来旅游的。我会停留[天数]天，然后返回中国。", cat: "实景" },
+  { type: "海关 · 行程", en: "Here are my hotel bookings, return ticket, and travel itinerary.", zh: "这是我的酒店订单、返程机票和旅行行程单。", cat: "实景" }
+);
+
+phoneDialogs.push(
+  {
+    cat: "实景对话",
+    scenario: "🏨 酒店办理入住 — 前台真实场景",
+    lines: [
+      { speaker: "Reception", text: "Good afternoon. Welcome to our hotel. How may I help you?" },
+      { speaker: "YOU", text: "Hello, I have a reservation under the name Wang. We are checking in today." },
+      { speaker: "Reception", text: "May I see your passports, please?" },
+      { speaker: "YOU", text: "Sure, here are our passports. Do you need a credit card for the deposit?" },
+      { speaker: "Reception", text: "Yes, we need a card for the security deposit. Your room will be ready in about 20 minutes." },
+      { speaker: "YOU", text: "No problem. Could we leave our luggage here while we wait?" }
+    ],
+    tip: "客人入住最常用：reservation under the name、passport、deposit、room key、luggage storage。可提前让客人把预订姓名和护照准备好。"
+  },
+  {
+    cat: "实景对话",
+    scenario: "🍽️ 餐厅点餐 — 不知道吃什么时",
+    lines: [
+      { speaker: "Server", text: "Good evening. Are you ready to order?" },
+      { speaker: "YOU", text: "Not yet. It is our first time here. What would you recommend?" },
+      { speaker: "Server", text: "Our signature seafood pasta and grilled steak are very popular." },
+      { speaker: "YOU", text: "That sounds good. Is the seafood pasta spicy?" },
+      { speaker: "Server", text: "A little bit, but we can make it mild." },
+      { speaker: "YOU", text: "Great. We will have one seafood pasta, one grilled steak, and two glasses of water, please." }
+    ],
+    tip: "点餐核心：recommend、signature dish、spicy/mild、allergy、bill。不会点就问 What would you recommend? 非常好用。"
+  },
+  {
+    cat: "实景对话",
+    scenario: "🧭 问路 — 找地铁站/景点",
+    lines: [
+      { speaker: "YOU", text: "Excuse me, could you tell me how to get to the nearest metro station?" },
+      { speaker: "Local", text: "Sure. Go straight for two blocks, then turn left. The station is on your right." },
+      { speaker: "YOU", text: "Thank you. Is it within walking distance?" },
+      { speaker: "Local", text: "Yes, it is about a ten-minute walk." },
+      { speaker: "YOU", text: "Perfect. Thank you so much for your help." }
+    ],
+    tip: "问路时先 Excuse me，听不懂就说 Could you show me on Google Maps? 比硬听方向更安全。"
+  },
+  {
+    cat: "实景对话",
+    scenario: "🚕 打车 — 给司机看地址",
+    lines: [
+      { speaker: "Driver", text: "Hello. Where would you like to go?" },
+      { speaker: "YOU", text: "Could you take us to this address, please? Here is the location on Google Maps." },
+      { speaker: "Driver", text: "Sure. It will take about 25 minutes, depending on traffic." },
+      { speaker: "YOU", text: "That's fine. Could you drop us off at the hotel entrance?" },
+      { speaker: "Driver", text: "No problem." },
+      { speaker: "YOU", text: "Thank you. Do you accept credit cards?" }
+    ],
+    tip: "打车要会说：take us to this address、drop us off、hotel entrance、Do you accept credit cards?"
+  },
+  {
+    cat: "实景对话",
+    scenario: "🚆 火车站买票/确认站台",
+    lines: [
+      { speaker: "Staff", text: "Hello. How can I help you?" },
+      { speaker: "YOU", text: "Two tickets to Florence, please. What time is the next train?" },
+      { speaker: "Staff", text: "The next train leaves at 10:30 from platform 6." },
+      { speaker: "YOU", text: "Is it a direct train or do we need to transfer?" },
+      { speaker: "Staff", text: "It is a direct train." },
+      { speaker: "YOU", text: "Great. Could we pay by credit card?" }
+    ],
+    tip: "欧洲自由行常用：next train、platform、direct train、transfer、one-way/round-trip。"
+  },
+  {
+    cat: "实景对话",
+    scenario: "🆘 寻求帮助 — 身体不舒服/找药房",
+    lines: [
+      { speaker: "YOU", text: "Excuse me, I don't feel well. Is there a pharmacy nearby?" },
+      { speaker: "Local", text: "Yes, there is one around the corner, next to the supermarket." },
+      { speaker: "YOU", text: "Thank you. Do you know if it is open now?" },
+      { speaker: "Local", text: "I think so. It usually closes at 8 PM." },
+      { speaker: "YOU", text: "Thank you so much. I really appreciate it." }
+    ],
+    tip: "身体不适但不是急救：I don't feel well. / pharmacy / clinic。紧急情况要说 This is an emergency. Please call an ambulance."
+  },
+  {
+    cat: "实景对话",
+    scenario: "🧳 行李丢失 — 机场柜台",
+    lines: [
+      { speaker: "Staff", text: "How can I assist you?" },
+      { speaker: "YOU", text: "My checked baggage did not arrive. Could you help me file a report?" },
+      { speaker: "Staff", text: "I am sorry to hear that. May I see your baggage tag and passport?" },
+      { speaker: "YOU", text: "Yes, here they are. We are staying at this hotel for the next two nights." },
+      { speaker: "Staff", text: "We will contact you once the bag is located." },
+      { speaker: "YOU", text: "Thank you. Could you please give me a copy of the report?" }
+    ],
+    tip: "行李丢失必须要：baggage tag、file a report、hotel address、copy of the report。方便后续保险理赔。"
+  },
+  {
+    cat: "实景对话",
+    scenario: "🛍️ 购物退税 — 商场柜台",
+    lines: [
+      { speaker: "Cashier", text: "Would you like a receipt?" },
+      { speaker: "YOU", text: "Yes, please. Can I also get a tax refund form?" },
+      { speaker: "Cashier", text: "Of course. May I see your passport?" },
+      { speaker: "YOU", text: "Sure. Here is my passport. Do I need to scan anything at the airport?" },
+      { speaker: "Cashier", text: "Yes, please validate the form at customs before departure." },
+      { speaker: "YOU", text: "Got it. Thank you for explaining." }
+    ],
+    tip: "退税核心：passport、tax refund form、receipt、customs validation。提醒客人机场退税要预留时间。"
+  },
+  {
+    cat: "实景对话",
+    scenario: "🎫 景点入场 — 出示二维码",
+    lines: [
+      { speaker: "Staff", text: "Tickets, please." },
+      { speaker: "YOU", text: "We booked tickets online. Do we need to show the QR code here?" },
+      { speaker: "Staff", text: "Yes, please show the QR code and your ID." },
+      { speaker: "YOU", text: "Here you go. Is audio guide included?" },
+      { speaker: "Staff", text: "No, but you can rent one at the counter." },
+      { speaker: "YOU", text: "Thank you. Where is the entrance for the guided tour?" }
+    ],
+    tip: "景点入场常用：QR code、ID、audio guide、guided tour、entrance、time slot。"
+  },
+  {
+    cat: "实景对话",
+    scenario: "🛂 入境海关 — 简单稳定回答",
+    lines: [
+      { speaker: "Officer", text: "What is the purpose of your visit?" },
+      { speaker: "YOU", text: "Tourism. I am here for a holiday." },
+      { speaker: "Officer", text: "How long will you stay?" },
+      { speaker: "YOU", text: "I will stay for ten days and return to China on May 10th." },
+      { speaker: "Officer", text: "Where will you stay?" },
+      { speaker: "YOU", text: "I will stay at this hotel. Here are my hotel booking, return ticket, and itinerary." }
+    ],
+    tip: "海关回答越简单越好：tourism、holiday、stay for X days、return ticket、hotel booking、itinerary。不要展开讲复杂故事。"
+  },
+  {
+    cat: "实景对话",
+    scenario: "😟 客人现场遇到问题 — 给酒店前台投诉",
+    lines: [
+      { speaker: "Reception", text: "How can I help you?" },
+      { speaker: "YOU", text: "I'm sorry, but there is a problem with our room. The room is not clean, and the air conditioner is not working." },
+      { speaker: "Reception", text: "I apologize for the inconvenience. Would you like us to send housekeeping?" },
+      { speaker: "YOU", text: "Yes, please. Also, if possible, could you move us to another room?" },
+      { speaker: "Reception", text: "Let me check the availability for you." },
+      { speaker: "YOU", text: "Thank you. We would really appreciate your help." }
+    ],
+    tip: "投诉时不要一上来很强硬，先说 there is a problem，再说具体问题，最后提出解决方案：send housekeeping / move to another room。"
+  },
+  {
+    cat: "实景对话",
+    scenario: "📱 听不懂对方时 — 万能自救",
+    lines: [
+      { speaker: "Staff", text: "The entrance is on the other side, past the information desk, then downstairs." },
+      { speaker: "YOU", text: "I'm sorry, could you speak a little more slowly?" },
+      { speaker: "Staff", text: "Sure. Go to the information desk, then take the stairs down." },
+      { speaker: "YOU", text: "Thank you. Could you show me on Google Maps or write it down for me?" },
+      { speaker: "Staff", text: "Of course." },
+      { speaker: "YOU", text: "Thank you. That helps a lot." }
+    ],
+    tip: "听不懂不用慌：speak more slowly、write it down、show me on Google Maps，这三句够用很多场景。"
+  }
+);
+
+
+const liveScenarios = [
+  {
+    cat: "酒店",
+    title: "🏨 办理入住",
+    role: "客户现场使用",
+    key: [
+      { en: "I have a reservation under the name Lin.", zh: "我有一个预订，名字是 Lin。" },
+      { en: "Could I check in now?", zh: "我现在可以办理入住吗？" },
+      { en: "Is breakfast included?", zh: "包含早餐吗？" },
+      { en: "Could you write down the Wi-Fi password for me?", zh: "可以帮我写一下Wi-Fi密码吗？" }
+    ],
+    dialog: [
+      { speaker: "Staff", text: "Welcome. May I have your passport, please?" },
+      { speaker: "YOU", text: "Sure. I have a reservation under the name Lin." },
+      { speaker: "Staff", text: "Your room will be ready shortly." },
+      { speaker: "YOU", text: "Thank you. Is breakfast included, and what time does it start?" }
+    ],
+    tip: "核心表达是 under the name + 姓名。客户到前台直接说这句，前台很容易查到订单。"
+  },
+  {
+    cat: "酒店",
+    title: "🛏 房间不满意 / 要换房",
+    role: "客户现场使用 / 你远程协助",
+    key: [
+      { en: "The room is not what we expected.", zh: "这个房间和我们预期的不太一样。" },
+      { en: "Could we change to a quieter room?", zh: "可以换到更安静的房间吗？" },
+      { en: "The air conditioner is not working properly.", zh: "空调不太正常。" },
+      { en: "Could someone come and check it?", zh: "可以请人过来看一下吗？" }
+    ],
+    dialog: [
+      { speaker: "YOU", text: "Excuse me, the room is quite noisy. Could we change to a quieter room if possible?" },
+      { speaker: "Staff", text: "Let me check availability for you." },
+      { speaker: "YOU", text: "Thank you. We would really appreciate it." }
+    ],
+    tip: "投诉不要一上来太强硬。先说 if possible / we would appreciate it，解决率更高。"
+  },
+  {
+    cat: "餐厅",
+    title: "🍽 不会点餐",
+    role: "客户现场使用",
+    key: [
+      { en: "Could you recommend something popular?", zh: "可以推荐一些受欢迎的菜吗？" },
+      { en: "What is your signature dish?", zh: "你们的招牌菜是什么？" },
+      { en: "We don’t eat beef.", zh: "我们不吃牛肉。" },
+      { en: "Can we share this dish?", zh: "这道菜可以分着吃吗？" }
+    ],
+    dialog: [
+      { speaker: "Waiter", text: "Are you ready to order?" },
+      { speaker: "YOU", text: "Not yet. Could you recommend something popular?" },
+      { speaker: "Waiter", text: "Our seafood pasta is very popular." },
+      { speaker: "YOU", text: "Great. We’ll have one seafood pasta and one salad to share." }
+    ],
+    tip: "不会点菜时用 recommend，比自己硬点更安全。忌口要提前说，例如 We don’t eat beef."
+  },
+  {
+    cat: "餐厅",
+    title: "🥜 过敏 / 忌口",
+    role: "客户现场使用",
+    key: [
+      { en: "I have a seafood allergy.", zh: "我对海鲜过敏。" },
+      { en: "Does this contain nuts?", zh: "这个里面含坚果吗？" },
+      { en: "Could you make it without onions?", zh: "可以不放洋葱吗？" },
+      { en: "It’s very important. I’m allergic.", zh: "这个很重要，我过敏。" }
+    ],
+    dialog: [
+      { speaker: "YOU", text: "I have a seafood allergy. Does this dish contain any seafood?" },
+      { speaker: "Waiter", text: "Let me check with the kitchen." },
+      { speaker: "YOU", text: "Thank you. It’s very important." }
+    ],
+    tip: "过敏要用 allergy / allergic，比 don’t like 更严肃，服务员会更重视。"
+  },
+  {
+    cat: "问路",
+    title: "🧭 问路 / 找地方",
+    role: "客户现场使用",
+    key: [
+      { en: "Excuse me, how do I get to the station?", zh: "不好意思，请问车站怎么走？" },
+      { en: "Is it far from here?", zh: "离这里远吗？" },
+      { en: "Can you show me on the map?", zh: "可以在地图上指给我看吗？" },
+      { en: "Is this the right way to the museum?", zh: "去博物馆是这个方向吗？" }
+    ],
+    dialog: [
+      { speaker: "YOU", text: "Excuse me, is this the right way to the station?" },
+      { speaker: "Local", text: "Yes, go straight and turn left at the traffic light." },
+      { speaker: "YOU", text: "Thank you. Is it far from here?" }
+    ],
+    tip: "问路第一句加 Excuse me，会自然很多。听不懂时直接让对方指地图。"
+  },
+  {
+    cat: "交通",
+    title: "🚕 打车 / 网约车沟通",
+    role: "客户现场使用",
+    key: [
+      { en: "Please take me to this address.", zh: "请带我去这个地址。" },
+      { en: "Can you use the meter?", zh: "可以打表吗？" },
+      { en: "Please stop here.", zh: "请在这里停车。" },
+      { en: "How long will it take?", zh: "大概需要多久？" }
+    ],
+    dialog: [
+      { speaker: "YOU", text: "Hello. Please take me to this address." },
+      { speaker: "Driver", text: "Sure. It will take about twenty minutes." },
+      { speaker: "YOU", text: "Okay, thank you. Please stop here when we arrive." }
+    ],
+    tip: "地址直接给司机看最安全，不要硬读复杂地址。必要时说 Please follow the navigation."
+  },
+  {
+    cat: "紧急",
+    title: "🧳 行李丢失",
+    role: "你处理 / 客户现场使用",
+    key: [
+      { en: "My luggage is missing.", zh: "我的行李丢了。" },
+      { en: "This is my baggage tag.", zh: "这是我的行李条。" },
+      { en: "Could you help me file a report?", zh: "可以帮我登记/立案吗？" },
+      { en: "When will it be delivered to my hotel?", zh: "什么时候能送到我的酒店？" }
+    ],
+    dialog: [
+      { speaker: "YOU", text: "Excuse me, my luggage is missing. This is my baggage tag." },
+      { speaker: "Staff", text: "I’m sorry. We’ll help you file a report." },
+      { speaker: "YOU", text: "Thank you. Could you deliver it to my hotel when it arrives?" }
+    ],
+    tip: "行李条 baggage tag 是关键凭证。客户到机场先拍照保存，丢行李时直接出示。"
+  },
+  {
+    cat: "医疗",
+    title: "💊 药房买药 / 身体不舒服",
+    role: "客户现场使用",
+    key: [
+      { en: "I have a fever.", zh: "我发烧了。" },
+      { en: "I have a sore throat.", zh: "我喉咙痛。" },
+      { en: "Do you have something for a cold?", zh: "有治疗感冒的药吗？" },
+      { en: "I’m allergic to penicillin.", zh: "我对青霉素过敏。" }
+    ],
+    dialog: [
+      { speaker: "YOU", text: "Hi, I have a fever and a sore throat. Do you have something for a cold?" },
+      { speaker: "Pharmacist", text: "Do you have any allergies?" },
+      { speaker: "YOU", text: "Yes, I’m allergic to penicillin." }
+    ],
+    tip: "医疗场景别说太复杂。症状 + 过敏史最重要。严重时直接说 I need to see a doctor."
+  },
+  {
+    cat: "购物",
+    title: "🛍 购物退税 / 退换货",
+    role: "客户现场使用",
+    key: [
+      { en: "Can I get a tax refund?", zh: "可以退税吗？" },
+      { en: "Where is the tax refund counter?", zh: "退税柜台在哪里？" },
+      { en: "Can I exchange this for another size?", zh: "可以换另一个尺码吗？" },
+      { en: "Can I return this?", zh: "这个可以退吗？" }
+    ],
+    dialog: [
+      { speaker: "YOU", text: "Can I get a tax refund for this purchase?" },
+      { speaker: "Staff", text: "Yes. Please show your passport." },
+      { speaker: "YOU", text: "Sure. Where is the tax refund counter?" }
+    ],
+    tip: "欧洲购物退税要带护照，付款前先问 tax refund，避免结账后补单麻烦。"
+  },
+  {
+    cat: "海关",
+    title: "🛃 入境问答",
+    role: "客户现场使用",
+    key: [
+      { en: "I’m here for tourism.", zh: "我是来旅游的。" },
+      { en: "I will stay for five days.", zh: "我会停留5天。" },
+      { en: "I’m staying at this hotel.", zh: "我住在这家酒店。" },
+      { en: "Here is my return ticket.", zh: "这是我的回程机票。" }
+    ],
+    dialog: [
+      { speaker: "Officer", text: "What is the purpose of your visit?" },
+      { speaker: "YOU", text: "I’m here for tourism." },
+      { speaker: "Officer", text: "How long will you stay?" },
+      { speaker: "YOU", text: "I will stay for five days. Here is my return ticket." }
+    ],
+    tip: "海关回答要短、准、稳。不要主动展开太多细节，问什么答什么。"
+  },
+  {
+    cat: "求助",
+    title: "🆘 听不懂 / 请求帮助",
+    role: "客户现场使用",
+    key: [
+      { en: "Sorry, could you speak more slowly?", zh: "不好意思，可以说慢一点吗？" },
+      { en: "Could you write it down for me?", zh: "可以帮我写下来吗？" },
+      { en: "Could you help me call this number?", zh: "可以帮我打这个电话吗？" },
+      { en: "I don’t speak English very well.", zh: "我英语说得不太好。" }
+    ],
+    dialog: [
+      { speaker: "YOU", text: "Sorry, I don’t speak English very well. Could you speak more slowly?" },
+      { speaker: "Staff", text: "Of course." },
+      { speaker: "YOU", text: "Thank you. Could you write it down for me?" }
+    ],
+    tip: "这是客户最该背熟的一组救命句。听不懂不要慌，直接要求 slow / write down。"
+  }
+];
+
+
+
+const proToolkit = [
+  {
+    cat: "邮件",
+    title: "📧 酒店预订邮件",
+    content: `Dear Sir or Madam,
+
+I hope this message finds you well.
+
+I would like to inquire about room availability from [date] to [date] for [number] guests.
+
+Could you please advise the room types available and the best rates?
+
+Also, kindly let me know your cancellation policy.
+
+I look forward to your reply.
+
+Best regards,
+[Your Name]`
+  },
+  {
+    cat: "邮件",
+    title: "📧 餐厅预约邮件",
+    content: `Dear [Restaurant Name],
+
+I would like to make a reservation for [number] guests on [date] at [time].
+
+Could you please let me know if there is any availability?
+
+If possible, we would prefer a quiet table / window seat.
+
+Thank you, and I look forward to your confirmation.
+
+Best regards,
+[Your Name]`
+  },
+  {
+    cat: "邮件",
+    title: "📧 修改预订 / 改时间",
+    content: `Dear [Hotel / Restaurant Name],
+
+I would like to modify an existing reservation.
+
+The current booking is under the name [Name], originally for [old date / time].
+
+We would like to change it to [new date / time].
+
+Please let me know if this is possible.
+
+Thank you for your help.`
+  },
+  {
+    cat: "邮件",
+    title: "📧 催回复",
+    content: `Dear [Name],
+
+Just following up on my previous email.
+
+Could you please advise at your earliest convenience?
+
+Looking forward to your reply.
+
+Thank you.`
+  },
+  {
+    cat: "邮件",
+    title: "📧 取消预订",
+    content: `Dear [Name],
+
+I am writing to cancel the reservation under the name [Name].
+
+The booking details are as follows:
+Date: [date]
+Confirmation number: [number]
+
+Could you please confirm the cancellation by email?
+
+Thank you.`
+  },
+  {
+    cat: "电话",
+    title: "📞 开场白（万能）",
+    content: `Hello, this is Lin calling from a travel agency.
+
+I’d like to make a reservation, please.
+
+May I speak with the reservations team?`
+  },
+  {
+    cat: "电话",
+    title: "📞 听不懂救命句",
+    content: `Sorry, could you speak a bit more slowly?
+
+Could you repeat that, please?
+
+Let me confirm what you said.
+
+Could you please send me the details by email?`
+  },
+  {
+    cat: "电话",
+    title: "📞 拼名字 / 邮箱",
+    content: `Let me spell that for you.
+
+L for Lima.
+I for India.
+N for November.
+
+My email address is [your email].`
+  },
+  {
+    cat: "电话",
+    title: "📞 确认信息",
+    content: `Let me confirm the details.
+
+The reservation is for [number] guests, on [date], at [time].
+
+The booking name is [Name].
+
+Is that correct?`
+  },
+  {
+    cat: "供应商",
+    title: "🏨 询价（酒店/包车/活动）",
+    content: `Could you offer your best available rate for this request?
+
+We are a travel agency and may have ongoing cooperation.
+
+Please also advise what is included in the price.`
+  },
+  {
+    cat: "供应商",
+    title: "🏨 问取消政策",
+    content: `Could you please confirm your cancellation policy?
+
+Is this booking refundable or non-refundable?
+
+Until when can we cancel without penalty?`
+  },
+  {
+    cat: "供应商",
+    title: "🏨 问付款方式 / 确认单",
+    content: `Could you please advise the payment method?
+
+Can we pay by credit card or bank transfer?
+
+After payment, could you send us a written confirmation?`
+  },
+  {
+    cat: "供应商",
+    title: "🚗 包车确认",
+    content: `Could you please confirm the private transfer details?
+
+Date: [date]
+Pick-up time: [time]
+Pick-up location: [location]
+Drop-off location: [location]
+Number of passengers: [number]
+Number of luggage: [number]
+
+Please also confirm the vehicle type and total price.`
+  },
+  {
+    cat: "突发",
+    title: "⚠️ 航班取消处理",
+    content: `The flight has been cancelled.
+
+We need to rebook as soon as possible.
+
+My client must arrive before [time].
+
+Could you please check the earliest available alternative flight?`
+  },
+  {
+    cat: "突发",
+    title: "⚠️ 酒店无房 / 查不到预订",
+    content: `There seems to be an issue with the reservation.
+
+My client has a confirmed booking.
+
+Here is the confirmation number: [number].
+
+Could you please check and resolve this urgently?`
+  },
+  {
+    cat: "突发",
+    title: "⚠️ 客人迟到 / 改接送时间",
+    content: `My client will be delayed.
+
+Could we change the pick-up time to [new time]?
+
+Please confirm if the driver can wait or adjust the schedule.`
+  },
+  {
+    cat: "投诉",
+    title: "🧾 酒店问题投诉",
+    content: `I’m contacting you regarding an issue with my client’s stay.
+
+The room / service did not meet the expected standard.
+
+Could you please look into this and provide a suitable solution?
+
+We would appreciate your prompt assistance.`
+  },
+  {
+    cat: "投诉",
+    title: "🧾 退款 / 补偿请求",
+    content: `Due to the inconvenience caused, we would like to request a refund or appropriate compensation.
+
+Could you please advise what solution you can offer?
+
+We hope to resolve this matter in a fair and reasonable way.`
+  }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let allCats = [...new Set(vocab.map(v => v.cat))];
+let activeCat = "all";
+let filteredCards = [];
+let cardIndex = 0;
+let revealed = false;
+let knowCount = 0, againCount = 0;
+
+let sentActiveCat = "all";
+let phoneActiveCat = "all";
+let liveActiveCat = "all";
+
+let quizIndex = 0;
+let qCorrect = 0, qWrong = 0;
+let quizAnswered = false;
+
+// ============================================================
+// TTS ENGINE
+// ============================================================
+let ttsVoice = null;
+let ttsRate = 0.9;
+let currentUtterance = null;
+
+function initTTS() {
+  const notice = document.getElementById('voiceNotice');
+  if (!window.speechSynthesis) {
+    notice.textContent = '⚠️ 当前浏览器不支持语音朗读';
+    return;
+  }
+
+  const tryLoad = () => {
+    const voices = speechSynthesis.getVoices();
+    // Prefer high-quality English voices
+    const preferred = [
+      'Samantha', 'Karen', 'Daniel', 'Moira',   // macOS/iOS
+      'Google UK English Female', 'Google US English',
+      'Microsoft Zira', 'Microsoft David',
+      'en-US-Neural2', 'en-GB-Neural2'
+    ];
+    let picked = null;
+    for (const name of preferred) {
+      picked = voices.find(v => v.name.includes(name));
+      if (picked) break;
+    }
+    if (!picked) picked = voices.find(v => v.lang.startsWith('en'));
+    ttsVoice = picked || null;
+
+    if (ttsVoice) {
+      notice.textContent = `🔊 语音：${ttsVoice.name.split(' ').slice(0,3).join(' ')}`;
+    } else if (voices.length > 0) {
+      notice.textContent = '⚠️ 未找到英语语音，请在系统设置中安装英语语音包';
+    } else {
+      notice.textContent = '正在加载语音引擎…';
+    }
+  };
+
+  tryLoad();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = tryLoad;
+  }
+}
+
+function speak(text, btnEl) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+
+  // Clean text for TTS (remove phonetic markers like / ... /)
+  const clean = text.replace(/\/[^/]+\//g, '').replace(/\[.*?\]/g, '').trim();
+
+  const utter = new SpeechSynthesisUtterance(clean);
+  utter.lang = 'en-US';
+  utter.rate = ttsRate;
+  utter.pitch = 1;
+  if (ttsVoice) utter.voice = ttsVoice;
+
+  // Button state
+  const allBtns = document.querySelectorAll('.speak-btn');
+  allBtns.forEach(b => b.classList.remove('speaking'));
+
+  if (btnEl) {
+    btnEl.classList.add('speaking');
+    utter.onend = () => btnEl.classList.remove('speaking');
+    utter.onerror = () => btnEl.classList.remove('speaking');
+  }
+
+  speechSynthesis.speak(utter);
+}
+
+function speakIcon() {
+  return `<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>`;
+}
+
+function setSpeed(val) {
+  ttsRate = parseFloat(val);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload = () => {
+  initTTS();
+  buildVocabCats();
+  loadCards();
+  buildSentenceCats();
+  renderSentences();
+  buildPhoneCats();
+  renderPhone();
+  buildLiveCats();
+  renderLive();
+  buildProCats();
+  renderPro();
+  loadQuiz();
+};
+
+// ============================================================
+// TAB
+// ============================================================
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['vocab','sentences','phone','live','pro','quiz'][i] === tab);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ============================================================
+// VOCAB
+// ============================================================
+function buildVocabCats() {
+  const el = document.getElementById('catPills');
+  const cats = ['全部', ...allCats];
+  el.innerHTML = cats.map((c,i) => `<button class="cat-pill ${i===0?'active':''}" onclick="setVocabCat('${c==='全部'?'all':c}', this)">${c}</button>`).join('');
+}
+
+function setVocabCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('#catPills .cat-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  cardIndex = 0; knowCount = 0; againCount = 0;
+  updateScores();
+  loadCards();
+}
+
+function loadCards() {
+  filteredCards = activeCat === 'all' ? [...vocab] : vocab.filter(v => v.cat === activeCat);
+  shuffle(filteredCards);
+  document.getElementById('totalCount').textContent = filteredCards.length;
+  showCard();
+}
+
+function showCard() {
+  const card = filteredCards[cardIndex];
+  if (!card) {
+    document.getElementById('flashcard').innerHTML = `<div class="empty-state">🎉 本轮全部完成！<br><br><button class="btn btn-next" style="width:100%" onclick="loadCards()">重新开始</button></div>`;
+    return;
+  }
+  revealed = false;
+  document.getElementById('cardTag').textContent = card.cat;
+  document.getElementById('cardEn').textContent = card.en;
+  document.getElementById('cardPhonetic').innerHTML = `
+    ${card.phonetic}
+    &nbsp;
+    <button class="speak-btn" onclick="speak('${card.en.replace(/'/g,"\\'")}', this)" title="朗读单词">
+      ${speakIcon()} 单词
+    </button>
+    <button class="speak-btn" onclick="speak('${card.example.replace(/'/g,"\\'")}', this)" title="朗读例句">
+      ${speakIcon()} 例句
+    </button>
+    <select class="speed-select" onchange="setSpeed(this.value)" title="语速">
+      <option value="0.7">慢速</option>
+      <option value="0.9" selected>正常</option>
+      <option value="1.2">快速</option>
+    </select>
+  `;
+  document.getElementById('cardZh').textContent = card.zh;
+  document.getElementById('cardExample').textContent = '例：' + card.example;
+  document.getElementById('cardReveal').classList.remove('shown');
+  document.getElementById('cardActions').innerHTML = `<button class="btn btn-reveal" onclick="revealCard()">点击查看释义</button>`;
+  document.getElementById('cardCounter').textContent = `${cardIndex + 1} / ${filteredCards.length}`;
+  document.getElementById('progressFill').style.width = ((cardIndex / filteredCards.length) * 100) + '%';
+}
+
+function revealCard() {
+  document.getElementById('cardReveal').classList.add('shown');
+  document.getElementById('cardActions').innerHTML = `
+    <button class="btn btn-again" onclick="markCard(false)">🔁 再练</button>
+    <button class="btn btn-know" onclick="markCard(true)">✓ 掌握</button>
+  `;
+}
+
+function markCard(know) {
+  if (know) knowCount++; else againCount++;
+  updateScores();
+  cardIndex++;
+  showCard();
+}
+
+function updateScores() {
+  document.getElementById('knowCount').textContent = knowCount;
+  document.getElementById('againCount').textContent = againCount;
+}
+
+// ============================================================
+// SENTENCES
+// ============================================================
+function buildSentenceCats() {
+  const cats = ['全部', ...new Set(sentences.map(s => s.cat))];
+  const el = document.getElementById('sentCatPills');
+  el.innerHTML = cats.map((c,i) => `<button class="cat-pill ${i===0?'active':''}" onclick="setSentCat('${c==='全部'?'all':c}', this)">${c}</button>`).join('');
+}
+
+function setSentCat(cat, btn) {
+  sentActiveCat = cat;
+  document.querySelectorAll('#sentCatPills .cat-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderSentences();
+}
+
+function renderSentences() {
+  const list = sentActiveCat === 'all' ? sentences : sentences.filter(s => s.cat === sentActiveCat);
+  let html = `<div class="section-title">📝 实用句型</div>`;
+  list.forEach((s, i) => {
+    const safeEn = s.en.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    html += `
+    <div class="sentence-card">
+      <div class="sentence-type">${s.type}</div>
+      <div class="sentence-en">${s.en}</div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <button class="speak-btn" onclick="speak('${safeEn}', this)">${speakIcon()} 朗读</button>
+        <span class="sentence-toggle" onclick="toggleSent(${i}, this)">查看中文 ▾</span>
+      </div>
+      <div class="sentence-zh" id="szh${i}">${s.zh}</div>
+    </div>`;
+  });
+  const pills = document.getElementById('sentCatPills');
+  pills.nextElementSibling && pills.nextElementSibling.tagName === 'DIV' && pills.nextElementSibling.remove();
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  document.getElementById('tab-sentences').appendChild(div);
+}
+
+function toggleSent(i, btn) {
+  const el = document.getElementById('szh' + i);
+  const shown = el.classList.toggle('shown');
+  btn.textContent = shown ? '收起 ▴' : '查看中文 ▾';
+}
+
+// ============================================================
+// PHONE
+// ============================================================
+function buildPhoneCats() {
+  const cats = ['全部', ...new Set(phoneDialogs.map(p => p.cat))];
+  const el = document.getElementById('phoneCatPills');
+  el.innerHTML = cats.map((c,i) => `<button class="cat-pill ${i===0?'active':''}" onclick="setPhoneCat('${c==='全部'?'all':c}', this)">${c}</button>`).join('');
+}
+
+function setPhoneCat(cat, btn) {
+  phoneActiveCat = cat;
+  document.querySelectorAll('#phoneCatPills .cat-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderPhone();
+}
+
+function renderPhone() {
+  const list = phoneActiveCat === 'all' ? phoneDialogs : phoneDialogs.filter(p => p.cat === phoneActiveCat);
+  let html = `<div class="section-title">📞 电话情景对话</div>`;
+  list.forEach((d, di) => {
+    html += `<div class="phone-card">
+      <div class="phone-scenario">${d.scenario}
+        <button class="speak-btn" style="margin-left:8px;border-color:rgba(201,168,76,0.4);color:#c9a84c;" onclick="playDialog(${di}, 0)" title="连续播放全部对话">${speakIcon()} 全部播放</button>
+      </div>`;
+    d.lines.forEach((l, li) => {
+      const safeText = l.text.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      html += `
+      <div class="phone-line-wrap">
+        <div class="phone-speaker">${l.speaker}</div>
+        <div class="phone-line ${l.speaker==='YOU'?'you':''}" id="pline-${di}-${li}">${l.text}
+          <button class="speak-btn" style="margin-left:8px;${l.speaker==='YOU'?'border-color:rgba(201,168,76,0.5);color:var(--gold-light)':''}" onclick="speak('${safeText}', this)">${speakIcon()}</button>
+        </div>
+      </div>`;
+    });
+    html += `<div class="phone-tip">${d.tip}</div></div>`;
+  });
+  document.getElementById('phoneList').innerHTML = html;
+}
+
+// Play full dialog sequentially
+function playDialog(di, li) {
+  const d = (phoneActiveCat === 'all' ? phoneDialogs : phoneDialogs.filter(p => p.cat === phoneActiveCat))[di];
+  if (!d || li >= d.lines.length) return;
+  speechSynthesis.cancel();
+
+  const lineEl = document.getElementById(`pline-${di}-${li}`);
+  const btn = lineEl ? lineEl.querySelector('.speak-btn') : null;
+
+  const utter = new SpeechSynthesisUtterance(d.lines[li].text);
+  utter.lang = 'en-US';
+  utter.rate = ttsRate;
+  if (ttsVoice) utter.voice = ttsVoice;
+
+  // Highlight current line
+  document.querySelectorAll('.phone-line').forEach(el => el.style.opacity = '0.45');
+  if (lineEl) lineEl.style.opacity = '1';
+  if (btn) btn.classList.add('speaking');
+
+  utter.onend = () => {
+    if (btn) btn.classList.remove('speaking');
+    setTimeout(() => playDialog(di, li + 1), 400);
+  };
+  utter.onerror = () => {
+    if (btn) btn.classList.remove('speaking');
+    document.querySelectorAll('.phone-line').forEach(el => el.style.opacity = '1');
+  };
+  if (li === d.lines.length - 1) {
+    utter.onend = () => {
+      if (btn) btn.classList.remove('speaking');
+      document.querySelectorAll('.phone-line').forEach(el => el.style.opacity = '1');
+    };
+  }
+  speechSynthesis.speak(utter);
+}
+
+
+// ============================================================
+// LIVE SCENARIOS
+// ============================================================
+function buildLiveCats() {
+  const cats = ['全部', ...new Set(liveScenarios.map(s => s.cat))];
+  const el = document.getElementById('liveCatPills');
+  el.innerHTML = cats.map((c,i) => `<button class="cat-pill ${i===0?'active':''}" onclick="setLiveCat('${c==='全部'?'all':c}', this)">${c}</button>`).join('');
+}
+
+function setLiveCat(cat, btn) {
+  liveActiveCat = cat;
+  document.querySelectorAll('#liveCatPills .cat-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderLive();
+}
+
+function escForAttr(text) {
+  return text.replace(/&/g, '&amp;').replace(/'/g, "&#39;").replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function renderLive() {
+  const list = liveActiveCat === 'all' ? liveScenarios : liveScenarios.filter(s => s.cat === liveActiveCat);
+  let html = `<div class="section-title">🔥 实战场景</div>`;
+
+  list.forEach((s) => {
+    html += `<div class="live-card">
+      <div class="live-title">${s.title}</div>
+      <div class="live-meta">${s.cat} ｜ ${s.role}</div>
+      <div class="live-subtitle">救命句 / 客户可直接照读</div>
+      ${s.key.map(k => {
+        const safeEn = escForAttr(k.en);
+        return `<div class="live-key">
+          <div class="live-en">${k.en}</div>
+          <div class="live-zh">${k.zh}</div>
+          <button class="speak-btn" style="margin-top:6px;" onclick="speak('${safeEn}', this)">${speakIcon()} 朗读</button>
+        </div>`;
+      }).join('')}
+      ${s.dialog && s.dialog.length ? `<div class="live-subtitle">完整对话 / 进阶练习</div>
+      <div class="live-dialog">
+        ${s.dialog.map(l => {
+          const safeText = escForAttr(l.text);
+          return `<div class="live-dialog-line">
+            <div class="live-speaker">${l.speaker}</div>
+            <div class="live-dialog-text ${l.speaker==='YOU'?'you':''}">${l.text}
+              <button class="speak-btn" style="margin-left:6px;" onclick="speak('${safeText}', this)">${speakIcon()}</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>` : ''}
+      <div class="phone-tip">${s.tip}</div>
+    </div>`;
+  });
+
+  document.getElementById('liveList').innerHTML = html;
+}
+
+
+// ============================================================
+// PRO TOOLKIT
+// ============================================================
+let proActiveCat = "all";
+
+function buildProCats() {
+  const cats = ['全部', ...new Set(proToolkit.map(s => s.cat))];
+  const el = document.getElementById('proCatPills');
+  if (!el) return;
+  el.innerHTML = cats.map((c,i) =>
+    `<button class="cat-pill ${i===0?'active':''}" onclick="setProCat('${c==='全部'?'all':c}', this)">${c}</button>`
+  ).join('');
+}
+
+function setProCat(cat, btn) {
+  proActiveCat = cat;
+  document.querySelectorAll('#proCatPills .cat-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderPro();
+}
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function jsSafe(text) {
+  return text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
+}
+
+function renderPro() {
+  const list = proActiveCat === 'all' ? proToolkit : proToolkit.filter(s => s.cat === proActiveCat);
+  let html = `<div class="section-title">🧠 定制师工作台</div>`;
+
+  list.forEach((s, index) => {
+    const safeContent = escapeHtml(s.content);
+    const safeSpeak = jsSafe(s.content);
+    html += `
+    <div class="sentence-card">
+      <div class="sentence-type">${s.title}</div>
+      <pre class="pro-template" style="white-space:pre-wrap;font-size:0.86rem;line-height:1.65;margin-top:10px;color:#333;font-family:'DM Sans',sans-serif;">${safeContent}</pre>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+        <button class="speak-btn" onclick="copyText(this)">📋 复制</button>
+        <button class="speak-btn" onclick="speak('${safeSpeak}', this)">${speakIcon()} 朗读</button>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('proList').innerHTML = html;
+}
+
+function copyText(btn){
+  const text = btn.closest('.sentence-card').querySelector('pre').innerText;
+  const done = () => {
+    btn.innerText = "✅ 已复制";
+    setTimeout(()=> btn.innerText="📋 复制",1500);
+  };
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  done();
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+function loadQuiz() {
+  quizIndex = 0; qCorrect = 0; qWrong = 0;
+  updateQScores();
+  nextQuiz();
+}
+
+function nextQuiz() {
+  quizAnswered = false;
+  const pool = [...vocab];
+  shuffle(pool);
+  const correct = pool[0];
+  const wrongs = pool.slice(1, 4);
+  const options = shuffle([correct, ...wrongs]);
+  const correctIdx = options.indexOf(correct);
+  const safeEn = correct.en.replace(/'/g, "\\'");
+
+  document.getElementById('quizArea').innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-q">以下哪个是正确的中文释义？</div>
+      <div class="quiz-prompt">${correct.en}
+        <button class="speak-btn" style="font-size:0.72rem;margin-left:8px;" onclick="speak('${safeEn}', this)">${speakIcon()} 听读音</button>
+      </div>
+      <div class="quiz-options">
+        ${options.map((o, i) => `<button class="quiz-opt" onclick="answerQuiz(${i}, ${correctIdx}, this)">${o.zh}</button>`).join('')}
+      </div>
+      <div class="quiz-feedback" id="quizFb">
+        <b>例句：</b>${correct.example}
+        <br><br>
+        <button class="btn btn-next" onclick="nextQuiz()">下一题 →</button>
+      </div>
+    </div>`;
+}
+
+function answerQuiz(i, correctIdx, btn) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const opts = document.querySelectorAll('.quiz-opt');
+  if (i === correctIdx) {
+    btn.classList.add('correct');
+    qCorrect++;
+  } else {
+    btn.classList.add('wrong');
+    opts[correctIdx].classList.add('correct');
+    qWrong++;
+  }
+  opts.forEach(o => o.disabled = true);
+  document.getElementById('quizFb').classList.add('shown');
+  updateQScores();
+}
+
+function updateQScores() {
+  document.getElementById('qCorrect').textContent = qCorrect;
+  document.getElementById('qWrong').textContent = qWrong;
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+</script>
+</body>
+</html>
